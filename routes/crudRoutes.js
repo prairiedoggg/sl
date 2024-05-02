@@ -119,30 +119,43 @@ router.delete("/users/:username/education/:_id", async (req, res) => {
 });
 
 // 자격증 정보 추가
-router.post("/users/:username/certificates", async (req, res) => {
-  const username = req.params.username;
-  const { name, issuingOrganization, issueDate } = req.body;
-  const user = await User2.findOne({ username }).select("-password");
+router.post("/users/:username/certificate", async (req, res) => {
+  try {
+    const username = req.params.username;
+    const { name, issuingOrganization, issueDate } = req.body;
 
-  const certificate = await Certificate.create({
-    name,
-    issuingOrganization,
-    issueDate,
-  });
-  user.certificates.push(certificate._id);
-  await user.save();
-  res.json(certificate);
+    const user = await User2.findOne({ username }).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
+    }
+
+    const putUser = await Certificate.create({
+      user: user._id,
+      name,
+      issuingOrganization,
+      issueDate,
+    });
+
+    user.certificate.push(putUser._id);
+    await user.save();
+
+    res.status(201).json(putUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 에러가 발생했습니다." });
+  }
 });
 
 // 자격증 정보 조회
-router.get("/users/:username/certificates", async (req, res) => {
+router.get("/users/:username/certificate", async (req, res) => {
   const username = req.params.username;
-  const user = await User2.findOne({ username }).populate("certificates");
-  res.json(user.certificates);
+  const user = await User2.findOne({ username }).populate("certificate");
+  res.json(user.certificate);
 });
 
 // 자격증 정보 수정
-router.patch("/users/:username/certificates/:_id", async (req, res) => {
+router.patch("/users/:username/certificate/:_id", async (req, res) => {
   const username = req.params.username;
   const _id = req.params._id;
   const { name, issuingOrganization, issueDate } = req.body;
@@ -153,6 +166,23 @@ router.patch("/users/:username/certificates/:_id", async (req, res) => {
     { $set: { name, issuingOrganization, issueDate } }
   );
   res.json({ message: "자격증 정보 수정 완료" });
+});
+
+// 자격증 정보 삭제
+router.delete("/users/:username/certificate/:_id", async (req, res) => {
+  const username = req.params.username;
+  const _id = req.params._id;
+  const updateUser = await User2.updateOne(
+    {
+      username: username,
+    },
+    {
+      $pull: {
+        certificate: _id,
+      },
+    }
+  );
+  res.json(updateUser);
 });
 
 module.exports = router;
