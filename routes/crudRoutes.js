@@ -248,4 +248,87 @@ router.delete("/users/:username/award/:_id", async (req, res) => {
   res.json(updateUser);
 });
 
+router.get("/users/:username/portfolio", async (req, res) => {
+  const username = req.params.username;
+  let putUser;
+
+  try {
+    putUser = await User2.findOne({
+      username,
+    }).populate("portfolioUrl");
+
+    if (!putUser) {
+      return res.status(404).send({
+        Message: "User not found",
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      Message: "Internal Server Error",
+    });
+  }
+
+  res.json(putUser); // 이제 putUser는 정의되었습니다.
+});
+
+//개인 페이지 추가 (학력)
+router.post("/users/:username/portfolio", async (req, res) => {
+  const username = req.params.username;
+  const { link } = req.body;
+  const user = await User2.findOne({
+    username,
+  }).select("-password");
+  const putUser = await Portfolio.create({
+    user: user._id,
+    link,
+  });
+  console.log(putUser);
+  user.portfolioUrl.push(putUser._id);
+  await user.save();
+  res.json(putUser);
+});
+
+//개인 페이지 수정
+router.patch("/users/:username/portfolio/:_id", async (req, res) => {
+  const username = req.params.username;
+  const _id = req.params._id;
+  const { link } = req.body;
+  const user = await User2.findOne({
+    username,
+  }).select("-password");
+
+  const patchUser = await Portfolio.updateOne(
+    {
+      user: user._id,
+      _id,
+    },
+    {
+      $set: {
+        link,
+      },
+    }
+  );
+  user.portfolioUrl.push(patchUser._id);
+  await user.save();
+  res.json(patchUser);
+});
+
+//개인 페이지 삭제
+router.delete("/users/:username/portfolio/:_id", async (req, res) => {
+  const username = req.params.username;
+  const _id = req.params._id;
+  const updateUser = await User2.updateOne(
+    {
+      username: username,
+    },
+    {
+      $pull: {
+        portfolioUrl: _id,
+      },
+    }
+  );
+  res.json(updateUser);
+});
+
 module.exports = router;
