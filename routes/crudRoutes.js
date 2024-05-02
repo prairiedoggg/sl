@@ -184,5 +184,68 @@ router.delete("/users/:username/certificate/:_id", async (req, res) => {
   );
   res.json(updateUser);
 });
+// 수상 정보 추가
+router.post("/users/:username/award", async (req, res) => {
+  const username = req.params.username;
+  const { awardName, issuingOrganization, issueDate } = req.body;
+  const user = await User2.findOne({
+    username,
+  }).select("-password");
+  const putUser = await Award.create({
+    user: user._id,
+
+    awardName,
+    issuingOrganization,
+    issueDate,
+  });
+  console.log(user.award);
+  user.award.push(putUser._id);
+  await user.save();
+  res.json(user);
+});
+
+//개인 수상 수정
+router.patch("/users/:username/award/:_id", async (req, res) => {
+  const username = req.params.username;
+  const _id = req.params._id;
+  const { awardName, issuingOrganization, issueDate } = req.body;
+  const user = await User2.findOne({
+    username,
+  }).select("-password");
+
+  const patchUser = await Award.updateOne(
+    {
+      user: user._id,
+      _id,
+    },
+    {
+      $set: {
+        awardName,
+        issuingOrganization,
+        issueDate,
+      },
+    }
+  );
+  user.award.push(patchUser._id);
+  await user.save();
+  res.json(patchUser);
+});
+
+//개인 페이지 삭제
+router.delete("/users/:username/award/:_id", async (req, res) => {
+  const username = req.params.username;
+  const _id = req.params._id;
+  const updateUser = await User2.updateOne(
+    {
+      username: username,
+    },
+    {
+      $pull: {
+        award: _id,
+      },
+    }
+  );
+  res.json(updateUser);
+});
 
 module.exports = router;
