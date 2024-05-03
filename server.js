@@ -20,9 +20,9 @@ require("dotenv").config();
 const { MongoClient, ObjectId } = require("mongodb");
 app.use(cookieParser());
 
-mongoose.connect(
-  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@cluster0.twfhw3u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
-);     
+mongoose.connect( 
+`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@shareliobackend.7wgu2k1.mongodb.net/testUser?retryWrites=true&w=majority&appName=SharelioBackEnd
+`);     
 
 app.use("/api/mypage", authBytoken);
 app.use("/api/mypage", require("./routes/mypageRoutes"))
@@ -58,12 +58,12 @@ const upload = multer({
 });
 
 // app.use("/", authRoutes);
-app.use("/", mockapi);
 // app.use("/", crudRoutes);
+app.use("/", mockapi);
 
 
-//전체 유저
-app.get("/users", async (req, res) => {
+//전체 유저  
+app.get("/api/users", async (req, res) => {
   const users = await User.find({}).select("-password");
   console.log("🚀 ~ router.get ~ users:", users);
   res.json(users);

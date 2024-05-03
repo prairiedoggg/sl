@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRET_KEY;
 const refKey = process.env.REFRESH_TOKEN_SECRET_KEY;
-
+    
 
 // 사용자 등록
 router.post('/register', async (req, res) => {
@@ -24,7 +24,8 @@ router.post('/register', async (req, res) => {
             username,  
             password: hashedPassword,
             email, 
-            profilePictureUrl: "https://sharelio.s3.ap-northeast-2.amazonaws.com/tmp_gallery.png"
+            profilePictureUrl: "https://sharelio.s3.ap-northeast-2.amazonaws.com/tmp_gallery.png",
+            comments: `안녕하세요, ${username} 입니다.`
         });
         res.json(newUser);
     } catch (e) {
