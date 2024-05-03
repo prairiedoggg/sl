@@ -8,6 +8,7 @@ const { authBytoken } = require("./middlewares/authBytoken");
 // const authRoutes = require("./routes/authRoutes");
 // const crudRoutes = require("./routes/crudRoutes");
 const newAuthRoutes = require("./routes/newAuthRoutes");
+// const {upload} = require("./middlewares/upload");
 
 const mockapi = require("./api/mockapi");
 const cookieParser = require("cookie-parser");
@@ -34,16 +35,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
 
 // //이미지 세팅
-// const { S3Client } = require("@aws-sdk/client-s3");
-// const multer = require("multer");
-// const multerS3 = require("multer-s3");
-// const s3 = new S3Client({
-//     region: "ap-northeast-2",
-//     credentials: {
-//         accessKeyId: process.env.AWS_KEY,
-//         secretAccessKey: process.env.AWS_KEY_SECRET_KEY,
-//     },
-// });
 const multer = require("multer");
 const upload = multer({
     limits: {
@@ -56,7 +47,6 @@ const upload = multer({
         cb(undefined, true);
     }
 });
-
 
 // const upload = multer({
 //     storage: multerS3({

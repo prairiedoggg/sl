@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const { authBytoken } = require("../middlewares/authBytoken");
+const multer = require("multer");
+const upload = multer({ dest : '../utils/upload'})
 
+// const { upload } = require("../middlewares/upload");
 const {
     User,
     Education,
@@ -27,24 +30,35 @@ router.get("/", async (req, res) => {
     res.json(user);
 });
 
+
+
 //자기소개, 프로필 사진 수정
-router.patch("/", async (req, res) => {
+router.patch("/", upload.single("profilePictureUrl"), async (req, res) => {
     const username = req.user.username;
     const comments = req.body.comments;
-    const profilePictureUrl = req.body.profilePictureUrl;
+    let profilePictureUrl;
+        
+    if (req.file) {
+        profilePictureUrl = req.file.path;
+    }
 
-    const user = await User.findOneAndUpdate(
-        {
-            username,
-        },
-        {
-            comments,
-            profilePictureUrl,
-        },
-        { new: true }
-    );
-    await user.save();
-    res.json(user);
+    try {
+        const user = await User.findOneAndUpdate(
+            {
+                username,
+            },
+            {
+                comments,
+                profilePictureUrl,
+            },
+            { new: true }
+        );
+        await user.save();
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "서버 에러가 발생했습니다." });
+    }
 });
 
 
@@ -117,11 +131,15 @@ router.patch("/education/:_id", async (req, res) => {
             },
         },
         { new: true }
-
     );
-    user.education.push(patchUser._id);
-    await user.save();
-    res.json(patchUser);
+
+    if (patchUser) {
+        user.education.push(patchUser._id);
+        await user.save();
+        res.json(patchUser);
+    } else {
+        res.status(404).json({ message: "Education not found" });
+    }
 });
 
 //개인 페이지 삭제
