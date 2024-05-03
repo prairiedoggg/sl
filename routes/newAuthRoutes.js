@@ -70,7 +70,7 @@ router.get("/register", (req, res) => {
 });
 
 // 사용자 로그인
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
     const { username, password } = req.body;
 
     try {
