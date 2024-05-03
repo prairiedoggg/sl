@@ -1,30 +1,37 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const User = require("./models/User");
-const authRoutes = require("./routes/authRoutes");
 const { isValidObjectId } = require("mongoose");
-const crudRoutes = require("./routes/crudRoutes");
 const app = express();
+const {
+  User,
+} = require("./models/newUser.js");
 const { authBytoken } = require("./middlewares/authBytoken");
+// const authRoutes = require("./routes/authRoutes");
+// const crudRoutes = require("./routes/crudRoutes");
 const newAuthRoutes = require("./routes/newAuthRoutes");
+
 const mockapi = require("./api/mockapi");
 const cookieParser = require("cookie-parser");
-
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
 app.set("view engine", "ejs");
 app.use(express.json());
-app.set("view engine", "ejs");
 require("dotenv").config();
 const { MongoClient, ObjectId } = require("mongodb");
 app.use(cookieParser());
 
 mongoose.connect(
-  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@shareliobackend.7wgu2k1.mongodb.net/?retryWrites=true&w=majority&appName=SharelioBackEnd`
-);
+  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@cluster0.twfhw3u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+);     
+
+app.use("/mypage", authBytoken);
+app.use("/mypage", require("./routes/mypageRoutes"))
 
 app.use("/", newAuthRoutes);
-app.use("/auth", authRoutes);
+// app.use("/", crudRoutes)
+// app.use("/auth", authRoutes);
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
 
@@ -45,18 +52,26 @@ const upload = multer({
     s3: s3,
     bucket: "sharelio",
     key: function (요청, file, cb) {
-      cb(null, Date.now().toString());
+      cb(null, Date.now().toString()); 
     },
   }),
 });
 
-app.use("/", authRoutes);
+// app.use("/", authRoutes);
 app.use("/", mockapi);
-app.use("/", crudRoutes);
+// app.use("/", crudRoutes);
 
-const port = process.env.PORT || 3000;
+
+//전체 유저
+app.get("/users", async (req, res) => {
+  const users = await User.find({}).select("-password");
+  console.log("🚀 ~ router.get ~ users:", users);
+  res.json(users);
+});
+
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
-  console.log(`http://localhost:3000/`);
+  console.log(`http://localhost:5000/`);  
 });
 
 app.get("/", (req, res) => {
@@ -84,16 +99,7 @@ app.post("/add", async (req, res) => {
   } //500은 서버의 잘못으로 인한 에러라는 뜻임
 });
 
-app.get("/user2", async (req, res) => {
-  try {
-    let result = await User.find({}).select("password");
-    // -_id로 제외 가능
-    res.json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-});
+
 
 app.get("/list", async (req, res) => {
   let page = parseInt(req.query.page) || 1;
@@ -115,9 +121,8 @@ app.get("/list", async (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("jwt");
   res.clearCookie("refreshToken");
-
+  res.status(200).send("로그아웃")
   console.log("로그아웃됨");
-  res.redirect("/login");
 });
 
 //상세페이지

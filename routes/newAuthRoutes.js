@@ -1,9 +1,8 @@
 require('dotenv').config()
 
-const { User2, Education, Certificate, Award, Portfolio } = require('../models/newUser.js');
+const { User, Education, Certificate, Award, Portfolio } = require('../models/newUser.js');
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -12,7 +11,7 @@ const refKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 
 // 사용자 등록
-router.post('/nregister', async (req, res) => {
+router.post('/register', async (req, res) => {
     const { username, password, email } = req.body;
     console.log(username, password, email);
     try {
@@ -21,10 +20,10 @@ router.post('/nregister', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // 사용자 생성
-        const newUser = await User2.create({
+        const newUser = await User.create({
             username,  
             password: hashedPassword,
-            email,
+            email, 
             profilePictureUrl: "https://sharelio.s3.ap-northeast-2.amazonaws.com/tmp_gallery.png"
         });
         res.json(newUser);
@@ -40,16 +39,16 @@ router.post('/nregister', async (req, res) => {
 
 
 
-router.get('/nregister', (req, res) => {
+router.get('/register', (req, res) => {
     res.render('register', {message: null});
 });
 
 // 사용자 로그인
 
 
-router.post('/nlogin', async (req, res) => {
+router.post('/login', async (req, res) => {
         const {username, password} = req.body; 
-        const user = await User2.findOne({username: username})
+        const user = await User.findOne({username: username})
         if (!user) {
             return res.status(400).json({
                 message: '사용자를 찾을 수 없습니다.'

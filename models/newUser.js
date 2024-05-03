@@ -1,6 +1,6 @@
 const { Schema, default: mongoose } = require("mongoose");
 
-const User2Schema = new Schema({
+const UserSchema = new Schema({
   username: {
     type: String,
     required: true,
@@ -39,10 +39,10 @@ const User2Schema = new Schema({
       ref: "Certificate",
     },
   ],
-  portfolioUrl: {
+  portfolioUrl: [{
     type: Schema.Types.ObjectId,
     ref: "Portfolio",
-  },
+  }],
 });
 
 const AwardSchema = new Schema({
@@ -107,11 +107,13 @@ const PortfolioSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
+  link:{
   type: String,
+  }
 });
 
 module.exports = {
-  User2: mongoose.model("User2", User2Schema),
+  User: mongoose.model("User", UserSchema),  
   Education: mongoose.model("Education", EducationSchema),
   Certificate: mongoose.model("Certificate", CertificateSchema),
   Award: mongoose.model("Award", AwardSchema),
