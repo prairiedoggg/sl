@@ -27,21 +27,26 @@ router.get("/", async (req, res) => {
     res.json(user);
 });
 
-//자기소개 수정
+//자기소개, 프로필 사진 수정
 router.patch("/", async (req, res) => {
     const username = req.user.username;
+    const comments = req.body.comments;
+    const profilePictureUrl = req.body.profilePictureUrl;
+
     const user = await User.findOneAndUpdate(
         {
             username,
         },
-        { comments: req.body.comments,
-          
+        {
+            comments,
+            profilePictureUrl,
         },
         { new: true }
     );
     await user.save();
     res.json(user);
 });
+
 
 //개인 학력 조회
 router.get("/education", async (req, res) => {

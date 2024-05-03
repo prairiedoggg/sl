@@ -33,27 +33,40 @@ app.use("/api", newAuthRoutes);
 app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
 
-//이미지 세팅
-const { S3Client } = require("@aws-sdk/client-s3");
+// //이미지 세팅
+// const { S3Client } = require("@aws-sdk/client-s3");
+// const multer = require("multer");
+// const multerS3 = require("multer-s3");
+// const s3 = new S3Client({
+//     region: "ap-northeast-2",
+//     credentials: {
+//         accessKeyId: process.env.AWS_KEY,
+//         secretAccessKey: process.env.AWS_KEY_SECRET_KEY,
+//     },
+// });
 const multer = require("multer");
-const multerS3 = require("multer-s3");
-const s3 = new S3Client({
-    region: "ap-northeast-2",
-    credentials: {
-        accessKeyId: process.env.AWS_KEY,
-        secretAccessKey: process.env.AWS_KEY_SECRET_KEY,
+const upload = multer({
+    limits: {
+        fileSize: 1000000 // 1MB 크기 제한
     },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(new Error('이미지 파일만 업로드 가능합니다.'));
+        }
+        cb(undefined, true);
+    }
 });
 
-const upload = multer({
-    storage: multerS3({
-        s3: s3,
-        bucket: "sharelio",
-        key: function (요청, file, cb) {
-            cb(null, Date.now().toString());
-        },
-    }),
-});
+
+// const upload = multer({
+//     storage: multerS3({
+//         s3: s3,
+//         bucket: "sharelio",
+//         key: function (요청, file, cb) {
+//             cb(null, Date.now().toString());
+//         },
+//     }),
+// });
 
 // app.use("/", authRoutes);
 // app.use("/", crudRoutes);
