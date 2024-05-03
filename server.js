@@ -105,12 +105,10 @@ app.post("/add", async (req, res) => {
         if (req.body.title == "") {
             res.send("제목없음");
         } else {
-            await db
-                .collection("post")
-                .insertOne({
-                    title: req.body.title,
-                    content: req.body.content,
-                });
+            await db.collection("post").insertOne({
+                title: req.body.title,
+                content: req.body.content,
+            });
             res.redirect("/list");
         }
     } catch (e) {
@@ -186,3 +184,4 @@ app.post("/edits/:username", upload.single("img1"), async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+//
