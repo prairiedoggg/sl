@@ -24,10 +24,10 @@ mongoose.connect(
   `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@cluster0.twfhw3u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 );     
 
-app.use("/mypage", authBytoken);
-app.use("/mypage", require("./routes/mypageRoutes"))
+app.use("/api/mypage", authBytoken);
+app.use("/api/mypage", require("./routes/mypageRoutes"))
 
-app.use("/", newAuthRoutes);
+app.use("/api", newAuthRoutes);
 // app.use("/", crudRoutes)
 // app.use("/auth", authRoutes);
 
