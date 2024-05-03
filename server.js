@@ -52,7 +52,7 @@ const upload = multer({
     s3: s3,
     bucket: "sharelio",
     key: function (요청, file, cb) {
-      cb(null, Date.now().toString()); 
+      cb(null, Date.now().toString());
     },
   }),
 });
@@ -69,9 +69,29 @@ app.get("/api/users", async (req, res) => {
   res.json(users);
 });
 
+app.use((error, req, res, next) => {
+  const { name, message, statusCode } = error;
+
+  if (statusCode >= 500 || statusCode === undefined) {
+    console.error(name, message);
+    res.statusCode = 500;
+    res.json({
+      error: "서버에서 에러가 발생하였습니다. 자세한 내용은 개발자에게 문의해주세요.",
+      data: null,
+    });
+    return;
+  }
+
+  res.statusCode = statusCode;
+  res.json({
+    error: message,
+    data: null,
+  });
+})
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-  console.log(`http://localhost:5000/`);  
+  console.log(`http://localhost:5000/`);
 });
 
 app.get("/", (req, res) => {
