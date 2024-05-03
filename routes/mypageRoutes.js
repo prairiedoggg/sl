@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const { authBytoken } = require("../middlewares/authBytoken");
 const multer = require("multer");
-const upload = multer({ dest : '../utils/upload'})
+const upload = multer({ storage: multer.memoryStorage() });
+const {createError, commonError} = require("../utils/error");
 
-// const { upload } = require("../middlewares/upload");
 const {
     User,
     Education,
@@ -12,8 +12,6 @@ const {
     Portfolio,
 } = require("../models/newUser.js");
 const mongoose = require("mongoose");
-
-//전체 유저조회
 
 //개인 페이지
 router.get("/", async (req, res) => {

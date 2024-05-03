@@ -28,8 +28,7 @@ app.use("/api/mypage", authBytoken);
 app.use("/api/mypage", require("./routes/mypageRoutes"));
 
 app.use("/api", newAuthRoutes);
-// app.use("/", crudRoutes)
-// app.use("/auth", authRoutes);
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
@@ -48,18 +47,6 @@ const upload = multer({
     }
 });
 
-// const upload = multer({
-//     storage: multerS3({
-//         s3: s3,
-//         bucket: "sharelio",
-//         key: function (요청, file, cb) {
-//             cb(null, Date.now().toString());
-//         },
-//     }),
-// });
-
-// app.use("/", authRoutes);
-// app.use("/", crudRoutes);
 app.use("/", mockapi);
 
 //전체 유저
