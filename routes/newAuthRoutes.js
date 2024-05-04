@@ -105,6 +105,14 @@ router.post("/login", async (req, res, next) => {
     }
 });
 
+//로그아웃
+router.post("/logout", (req, res) => {
+    res.clearCookie("jwt");
+    res.clearCookie("refreshToken");
+    res.status(200).send("로그아웃");
+    console.log("로그아웃됨");
+});
+
 router.post("/token", (req, res) => {
     console.log("만료됨");
     const refreshToken = req.cookies.refreshToken;

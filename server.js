@@ -124,13 +124,6 @@ app.get("/list", async (req, res) => {
     }
 });
 
-app.post("/api/logout", (req, res) => {
-    res.clearCookie("jwt");
-    res.clearCookie("refreshToken");
-    res.status(200).send("로그아웃");
-    console.log("로그아웃됨");
-});
-
 //상세페이지
 app.get("/user/:username", async (req, res) => {
     let username = req.params.username;
