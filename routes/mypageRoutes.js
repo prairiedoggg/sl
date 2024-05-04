@@ -28,16 +28,17 @@ router.get("/", async (req, res, next) => {
             .populate("certificate")
             .populate("award")
             .populate("portfolioUrl");
+        res.json(user);
         
         if(!user) {
             return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
         }
+
     }
     catch(err) {
         next(err);
     }
 
-    res.json(user);
 });
 
 //자기소개, 프로필 사진 수정
@@ -217,7 +218,6 @@ router.delete("/education/:_id", async (req, res, next) => {
 });
 
 // 자격증 정보 추가
-// 자격증 정보 추가
 router.post("/certificate", async (req, res, next) => {
     const username = req.user.username;
     if (!username) {
@@ -333,6 +333,23 @@ router.delete("/certificate/:_id", async (req, res, next) => {
     }
 });
 
+router.get('/award' , async (req, res, next) => {
+    const username = req.user.username;
+    if (!username) {
+        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    }
+    try {
+        const user = await User.findOne({ username }).populate("award");
+        if (!user) {
+            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+        }
+
+        res.json(user.award);
+    } catch (error) {
+        next(error);
+    }
+
+})
 // 수상 정보 추가
 router.post("/award", async (req, res, next) => {
     const username = req.user.username;

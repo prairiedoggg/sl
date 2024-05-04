@@ -124,7 +124,7 @@ app.get("/list", async (req, res) => {
     }
 });
 
-app.post("/logout", (req, res) => {
+app.post("/api/logout", (req, res) => {
     res.clearCookie("jwt");
     res.clearCookie("refreshToken");
     res.status(200).send("로그아웃");
