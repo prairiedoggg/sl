@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const { authBytoken } = require("../middlewares/authBytoken");
 const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() });
+const path = require("path");
 const { createError, commonError } = require("../utils/error");
-
+const fs = require("fs");
 const {
     User,
     Education,
@@ -13,10 +13,46 @@ const {
 } = require("../models/newUser.js");
 const mongoose = require("mongoose");
 
+// 업로드 디렉토리 설정
+const uploadDir = path.join(__dirname, "../public/uploads");
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+    }
+
+// multer 설정
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(
+            null,
+            file.fieldname +
+                "-" +
+                uniqueSuffix +
+                path.extname(file.originalname)
+        );
+    },
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 1000000, // 1MB 크기 제한
+    },
+    fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(new Error("이미지 파일만 업로드 가능합니다."));
+        }
+        cb(undefined, true);
+    },
+});
 
 //개인 페이지
 router.get("/", async (req, res, next) => {
-    console.log(req.user)
+    console.log(req.user);
     if (!req.user) {
         return next(
             createError(
@@ -90,8 +126,8 @@ router.patch(
     "/profile-picture",
     upload.single("profilePictureUrl"),
     async (req, res, next) => {
-        const email = req.user.email;
-        if (!email) {
+        const username = req.user.username;
+        if (!username) {
             return next(
                 createError(
                     "NO_ACCESS_TOKEN",
@@ -116,7 +152,7 @@ router.patch(
 
         try {
             const user = await User.findOneAndUpdate(
-                { email },
+                { username },
                 { profilePictureUrl },
                 { new: true }
             );
@@ -127,6 +163,7 @@ router.patch(
         }
     }
 );
+
 
 //개인 학력 조회
 router.get("/education", async (req, res, next) => {
@@ -181,7 +218,7 @@ router.post("/education", async (req, res, next) => {
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
         );
     }
-    
+
     const start = new Date(startDate);
     const end = new Date(endDate);
     const now = new Date();
@@ -388,7 +425,7 @@ router.post("/certificate", async (req, res, next) => {
         );
     }
     const now = new Date();
-    const date = new Date(issueDate)
+    const date = new Date(issueDate);
     if (date > now) {
         return next(
             createError(
@@ -396,7 +433,7 @@ router.post("/certificate", async (req, res, next) => {
                 "발급날짜가 나중일 수 없습니다.",
                 400
             )
-        )
+        );
     }
     const { name, issuingOrganization, issueDate } = req.body;
     if (!name || !issuingOrganization || !issueDate) {
@@ -404,7 +441,7 @@ router.post("/certificate", async (req, res, next) => {
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
         );
     }
-    
+
     try {
         const user = await User.findOne({ email }).select("-password");
 
@@ -492,7 +529,7 @@ router.patch("/certificate/:_id", async (req, res, next) => {
         );
     }
     const now = new Date();
-    const date = new Date(issueDate)
+    const date = new Date(issueDate);
     if (date > now) {
         return next(
             createError(
@@ -500,7 +537,7 @@ router.patch("/certificate/:_id", async (req, res, next) => {
                 "발급날짜가 나중일 수 없습니다.",
                 400
             )
-        )
+        );
     }
     try {
         const user = await User.findOne({ email }).select("-password");
@@ -609,7 +646,7 @@ router.post("/award", async (req, res, next) => {
         );
     }
     const now = new Date();
-    const date = new Date(issueDate)
+    const date = new Date(issueDate);
     if (date > now) {
         return next(
             createError(
@@ -617,7 +654,7 @@ router.post("/award", async (req, res, next) => {
                 "발급날짜가 나중일 수 없습니다.",
                 400
             )
-        )
+        );
     }
     try {
         const user = await User.findOne({
@@ -676,7 +713,7 @@ router.patch("/award/:_id", async (req, res, next) => {
         );
     }
     const now = new Date();
-    const date = new Date(issueDate)
+    const date = new Date(issueDate);
     if (date > now) {
         return next(
             createError(
@@ -684,7 +721,7 @@ router.patch("/award/:_id", async (req, res, next) => {
                 "발급날짜가 나중일 수 없습니다.",
                 400
             )
-        )
+        );
     }
     try {
         const user = await User.findOne({
@@ -724,7 +761,7 @@ router.patch("/award/:_id", async (req, res, next) => {
     }
 });
 
-//개인 페이지 삭제
+//개인 수상 페이지 삭제
 router.delete("/award/:_id", async (req, res, next) => {
     const email = req.user.email;
     if (!email) {
@@ -761,6 +798,7 @@ router.delete("/award/:_id", async (req, res, next) => {
     }
 });
 
+//개인 포트폴리오 조회
 router.get("/portfolio", async (req, res, next) => {
     const email = req.user.email;
     if (!email) {
@@ -807,8 +845,8 @@ router.post("/portfolio", async (req, res, next) => {
         );
     }
 
-    const { link, startdate, enddate } = req.body;
-    if (!link || !startdate || !enddate) {
+    const { link, startDate, endDate } = req.body;
+    if (!link || !startDate || !endDate) {
         return next(
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
         );
@@ -856,8 +894,8 @@ router.post("/portfolio", async (req, res, next) => {
         const putUser = await Portfolio.create({
             user: user._id,
             link,
-            startdate,
-            enddate,
+            startDate,
+            endDate,
         });
 
         user.portfolioUrl.push(putUser._id);
@@ -888,8 +926,8 @@ router.patch("/portfolio/:_id", async (req, res, next) => {
         );
     }
 
-    const { link, startdate, enddate } = req.body;
-    if (!link || !startdate || !enddate) {
+    const { link, startDate, endDate } = req.body;
+    if (!link || !startDate || !endDate) {
         return next(
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
         );
@@ -943,8 +981,8 @@ router.patch("/portfolio/:_id", async (req, res, next) => {
             {
                 $set: {
                     link,
-                    startdate,
-                    enddate
+                    startDate,
+                    endDate,
                 },
             },
             { new: true }
