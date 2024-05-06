@@ -3,11 +3,14 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const { isValidObjectId } = require("mongoose");
 const app = express();
-const { User } = require("./models/newUser.js");
+const { User } = require("./models/models.js");
 const { authBytoken } = require("./middlewares/authBytoken");
 const newAuthRoutes = require("./routes/newAuthRoutes");
 const mypageRoutes = require("./routes/mypageRoutes");
 const userRoutes = require("./routes/userRoutes");
+const eduRoutes = require("./routes/eduRoutes");
+const certRoutes = require("./routes/certRoutes");
+const awardRoutes = require("./routes/awardRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
@@ -26,6 +29,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', userRoutes);
 app.use('/api', newAuthRoutes);
 app.use('/api/mypage', authBytoken, mypageRoutes);
+app.use('/api/mypage/education', eduRoutes)
+app.use('/api/mypage/certificate', certRoutes);
+app.use('/api/mypage/award', awardRoutes);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
@@ -35,3 +41,4 @@ app.listen(port, () => {
 
 //에러핸들러
 app.use(errorHandler);
+

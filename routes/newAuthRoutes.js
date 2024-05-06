@@ -6,7 +6,7 @@ const {
     Certificate,
     Award,
     Portfolio,
-} = require("../models/newUser.js");
+} = require("../models/models.js");
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");

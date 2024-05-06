@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { User } = require("../models/newUser.js");
+const { User } = require("../models/models.js");
 
 //페이지네이션
 router.get("/list", async (req, res) => {
