@@ -1,28 +1,16 @@
 const router = require("express").Router();
 const {
     User,
-    Education,
-    Certificate,
-    Award,
     Portfolio,
 } = require("../models/models.js");
+const { portfolioFieldsCheck, checkDateRange } = require("../utils/validation");
 
 //개인 포트폴리오 조회
 router.get("/", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
 
     try {
         const putUser = await User.findOne({
-            email,
+            email : req.user.email,
         }).populate("portfolioUrl");
 
         if (!putUser) {
@@ -42,52 +30,11 @@ router.get("/", async (req, res, next) => {
 });
 
 //개인 페이지 추가 (포트폴리오)
-router.post("/", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+router.post("/", portfolioFieldsCheck, checkDateRange, async (req, res, next) => {
 
-    const { link, startDate, endDate } = req.body;
-    if (!link || !startDate || !endDate) {
-        return next(
-            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
-        );
-    }
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const now = new Date();
-
-    // startDate가 endDate보다 빠른 날짜인지 검증
-    if (start >= end) {
-        return next(
-            createError(
-                "INVALID_DATE_RANGE",
-                "시작 날짜가 종료 날짜보다 같거나 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
-
-    // endDate가 현재보다 나중으로 선택되지 않도록 검증
-    if (end > now) {
-        return next(
-            createError(
-                "INVALID_END_DATE",
-                "종료 날짜는 현재 날짜보다 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
     try {
         const user = await User.findOne({
-            email,
+            email : req.user.email,
         }).select("-password");
 
         if (!user) {
@@ -102,9 +49,9 @@ router.post("/", async (req, res, next) => {
 
         const putUser = await Portfolio.create({
             user: user._id,
-            link,
-            startDate,
-            endDate,
+            link: req.body.link,
+            startDate : req.body.startDate,
+            endDate : req.body.endDate,
         });
 
         user.portfolioUrl.push(putUser._id);
@@ -116,17 +63,7 @@ router.post("/", async (req, res, next) => {
 });
 
 //개인 페이지 수정 (포트폴리오)
-router.patch("/:_id", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+router.patch("/:_id", portfolioFieldsCheck, checkDateRange, async (req, res, next) => {
 
     const _id = req.params._id;
     if (!_id) {
@@ -135,41 +72,9 @@ router.patch("/:_id", async (req, res, next) => {
         );
     }
 
-    const { link, startDate, endDate } = req.body;
-    if (!link || !startDate || !endDate) {
-        return next(
-            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
-        );
-    }
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const now = new Date();
-
-    // startDate가 endDate보다 빠른 날짜인지 검증
-    if (start >= end) {
-        return next(
-            createError(
-                "INVALID_DATE_RANGE",
-                "시작 날짜가 종료 날짜보다 같거나 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
-
-    // endDate가 현재보다 나중으로 선택되지 않도록 검증
-    if (end > now) {
-        return next(
-            createError(
-                "INVALID_END_DATE",
-                "종료 날짜는 현재 날짜보다 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
-
     try {
         const user = await User.findOne({
-            email,
+            email: req.user.email,
         }).select("-password");
 
         if (!user) {
@@ -189,9 +94,9 @@ router.patch("/:_id", async (req, res, next) => {
             },
             {
                 $set: {
-                    link,
-                    startDate,
-                    endDate,
+                    link : req.body.link,
+                    startDate : req.body.startDate,
+                    endDate : req.body.endDate,
                 },
             },
             { new: true }
@@ -207,16 +112,6 @@ router.patch("/:_id", async (req, res, next) => {
 
 //포트폴리오 삭제
 router.delete("/:_id", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
 
     const _id = req.params._id;
     if (!_id) {
@@ -228,7 +123,7 @@ router.delete("/:_id", async (req, res, next) => {
     try {
         const updateUser = await User.findOneAndUpdate(
             {
-                email: email,
+                email: req.user.email,
             },
             {
                 $pull: {

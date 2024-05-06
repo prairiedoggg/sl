@@ -6,23 +6,17 @@ const {
     Award,
     Portfolio,
 } = require("../models/models.js");
+const { checkToken, checkRequiredFields, checkDateRange } = require("../utils/validation");
+
+
 
 //개인 학력 조회
 router.get("/", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+
     let putUser;
     try {
         putUser = await User.findOne({
-            email,
+            email:req.user.email,
         }).populate("education");
 
         if (!putUser) {
@@ -43,16 +37,7 @@ router.get("/", async (req, res, next) => {
 
 //개인 페이지 추가 (학력)
 router.post("/", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+
     const { schoolName, degree, fieldOfStudy, startDate, endDate } = req.body;
 
     if (!schoolName || !degree || !fieldOfStudy || !startDate || !endDate) {
@@ -89,7 +74,7 @@ router.post("/", async (req, res, next) => {
 
     try {
         const user = await User.findOne({
-            email,
+            email:req.user.email,
         }).select("-password");
 
         if (!user) {
@@ -121,18 +106,8 @@ router.post("/", async (req, res, next) => {
 
 //학력 페이지 수정
 router.patch("/:_id", async (req, res, next) => {
-    const email = req.user.email;
     const _id = req.params._id;
     const { schoolName, degree, fieldOfStudy, startDate, endDate } = req.body;
-    if (!email) {
-        next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
     if (
         !_id ||
         !schoolName ||
@@ -220,16 +195,7 @@ router.patch("/:_id", async (req, res, next) => {
 
 //학력 페이지 삭제
 router.delete("/:_id", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+
     const _id = req.params._id;
     if (!_id) {
         next(
@@ -239,7 +205,7 @@ router.delete("/:_id", async (req, res, next) => {
     try {
         const updateUser = await User.findOneAndUpdate(
             {
-                email: email,
+                email: req.user.email,
             },
             {
                 $pull: {

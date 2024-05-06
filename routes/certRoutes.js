@@ -6,22 +6,14 @@ const {
     Award,
     Portfolio,
 } = require("../models/models.js");
+const { checkRequiredFields, checkDate } = require("../utils/validation");
 
 // 자격증 정보 조회
 router.get("/certificate", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+
 
     try {
-        const user = await User.findOne({ email }).populate("certificate");
+        const user = await User.findOne({ email : req.user.email }).populate("certificate");
         if (!user) {
             return next(
                 createError(
@@ -40,18 +32,8 @@ router.get("/certificate", async (req, res, next) => {
 
 
 // 자격증 정보 추가
-router.post("/certificate", async (req, res, next) => {
-    const email = req.user.email;
-    
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+router.post("/certificate", checkDate, async (req, res, next) => {
+
 
     const { name, issuingOrganization, issueDate } = req.body;
     if (!name || !issuingOrganization || !issueDate) {
@@ -59,19 +41,9 @@ router.post("/certificate", async (req, res, next) => {
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
         );
     }
-    const now = new Date();
-    const date = new Date(issueDate);
-    if (date > now) {
-        return next(
-            createError(
-                "INVALID_DATE_RANGE",
-                "발급날짜가 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
+
     try {
-        const user = await User.findOne({ email }).select("-password");
+        const user = await User.findOne({ email : req.user.email }).select("-password");
 
         if (!user) {
             return next(
@@ -100,17 +72,7 @@ router.post("/certificate", async (req, res, next) => {
 });
 
 // 자격증 정보 수정
-router.patch("/certificate/:_id", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+router.patch("/certificate/:_id", checkDate, async (req, res, next) => {
 
     const _id = req.params._id;
     if (!_id) {
@@ -125,19 +87,9 @@ router.patch("/certificate/:_id", async (req, res, next) => {
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
         );
     }
-    const now = new Date();
-    const date = new Date(issueDate);
-    if (date > now) {
-        return next(
-            createError(
-                "INVALID_DATE_RANGE",
-                "발급날짜가 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
+
     try {
-        const user = await User.findOne({ email }).select("-password");
+        const user = await User.findOne({ email : req.user.mail }).select("-password");
         if (!user) {
             return next(
                 createError(
@@ -160,16 +112,6 @@ router.patch("/certificate/:_id", async (req, res, next) => {
 
 // 자격증 정보 삭제
 router.delete("/certificate/:_id", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
 
     const _id = req.params._id;
     if (!_id) {
@@ -181,7 +123,7 @@ router.delete("/certificate/:_id", async (req, res, next) => {
     try {
         const updateUser = await User.findOneAndUpdate(
             {
-                email: email,
+                email: req.user.email,
             },
             {
                 $pull: {

@@ -14,12 +14,15 @@ const awardRoutes = require("./routes/awardRoutes");
 const portfolioRoutes = require("./routes/portfolioRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
+const { checkToken } = require("./utils/validation");
+
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
 app.set("view engine", "ejs");
 app.use(express.json());
 require("dotenv").config();
 const { MongoClient, ObjectId } = require("mongodb");
 app.use(cookieParser());
+
 
 mongoose.connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@shareliobackend.7wgu2k1.mongodb.net/testUser?retryWrites=true&w=majority&appName=SharelioBackEnd
@@ -29,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/users', userRoutes);
 app.use('/api', newAuthRoutes);
-app.use('/api/mypage', authBytoken, mypageRoutes);
+app.use('/api/mypage', authBytoken, checkToken, mypageRoutes);
 app.use('/api/mypage/education', eduRoutes)
 app.use('/api/mypage/certificate', certRoutes);
 app.use('/api/mypage/award', awardRoutes);
