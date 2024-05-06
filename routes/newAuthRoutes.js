@@ -35,6 +35,12 @@ router.post("/register", async (req, res) => {
             message: "비밀번호는 특수문자를 포함한 8자 이상어야 합니다.",
         });
     }
+    // 비밀번호 일치 검증
+    if (password !== confirmPassword) {
+        return res
+            .status(400)
+            .json({ message: "비밀번호가 일치하지 않습니다." });
+    }
     // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -44,6 +50,10 @@ router.post("/register", async (req, res) => {
     }
 
     try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "이미 가입된 메일입니다." });
+        }
         // 비밀번호 암호화
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
