@@ -17,6 +17,13 @@ const refKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 const { authBytoken } = require("../middlewares/authBytoken");
 const { commonError, createError } = require("../utils/error");
 
+router.use((req, res, next) => {
+    if (req.path === "/login" || req.path === "/register") {
+        return next();
+    }
+    authBytoken(req, res, next);
+});
+
 // 사용자 등록
 router.post("/register", async (req, res) => {
     const { username, password, email } = req.body;
@@ -71,10 +78,10 @@ router.get("/register", (req, res) => {
 
 // 사용자 로그인
 router.post("/login", async (req, res, next) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ username: username });
+        const user = await User.findOne({ email: email });
         if (!user) {
             throw createError(
                 commonError.UNAUTHORIZED.name,
@@ -90,15 +97,15 @@ router.post("/login", async (req, res, next) => {
                 401
             );
         }
-        const payload = { username: username };
+        const payload = { email : email };
         const token = jwt.sign(payload, secretKey);
         const reftoken = jwt.sign(payload, refKey);
         console.log("🚀 ~ router.post ~ token:", token);
         res.cookie("refreshToken", reftoken, {
             httpOnly: true,
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
         });
-        res.cookie("jwt", token, { httpOnly: true, maxAge: 1000 * 60 * 60 });
+        res.cookie("jwt", token, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15분
         res.json(user);
     } catch (error) {
         next(error);

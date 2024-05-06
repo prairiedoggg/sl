@@ -5,12 +5,8 @@ const { isValidObjectId } = require("mongoose");
 const app = express();
 const { User } = require("./models/newUser.js");
 const { authBytoken } = require("./middlewares/authBytoken");
-// const authRoutes = require("./routes/authRoutes");
-// const crudRoutes = require("./routes/crudRoutes");
 const newAuthRoutes = require("./routes/newAuthRoutes");
-// const {upload} = require("./middlewares/upload");
-
-const mockapi = require("./api/mockapi");
+const mypageRoutes = require("./routes/mypageRoutes");
 const cookieParser = require("cookie-parser");
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
 app.set("view engine", "ejs");
@@ -21,33 +17,16 @@ app.use(cookieParser());
 
 mongoose.connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@shareliobackend.7wgu2k1.mongodb.net/testUser?retryWrites=true&w=majority&appName=SharelioBackEnd
-`
-);
+`);
 
-app.use("/api/mypage", authBytoken);
-app.use("/api/mypage", require("./routes/mypageRoutes"));
 
-app.use("/api", newAuthRoutes);
 
 
 app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
 
-// //이미지 세팅
-const multer = require("multer");
-const upload = multer({
-    limits: {
-        fileSize: 1000000 // 1MB 크기 제한
-    },
-    fileFilter(req, file, cb) {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return cb(new Error('이미지 파일만 업로드 가능합니다.'));
-        }
-        cb(undefined, true);
-    }
-});
-
-app.use("/", mockapi);
+app.use('/api', newAuthRoutes)
+app.use('/api/mypage', mypageRoutes)
 
 //전체 유저
 app.get("/api/users", async (req, res) => {
@@ -56,6 +35,7 @@ app.get("/api/users", async (req, res) => {
     res.json(users);
 });
 
+//에러핸들러
 app.use((error, req, res, next) => {
     const { name, message, statusCode } = error;
 
@@ -81,33 +61,8 @@ app.listen(port, () => {
     console.log(`http://localhost:3000/`);
 });
 
-app.get("/", (req, res) => {
-    res.render("main.ejs");
-});
-
-app.get("/write", authBytoken, (req, res) => {
-    res.render("write.ejs");
-});
-app.post("/add", async (req, res) => {
-    console.log(req.body);
-
-    try {
-        if (req.body.title == "") {
-            res.send("제목없음");
-        } else {
-            await db.collection("post").insertOne({
-                title: req.body.title,
-                content: req.body.content,
-            });
-            res.redirect("/list");
-        }
-    } catch (e) {
-        console.log(e); // 콘솔창에 에러가 났다는 것을 알리기 위함
-        res.status(500).send("server error");
-    } //500은 서버의 잘못으로 인한 에러라는 뜻임
-});
-
-app.get("/list", async (req, res) => {
+//페이지네이션
+app.get("/api/list", async (req, res) => {
     let page = parseInt(req.query.page) || 1;
     let limit = 12;
     let skip = (page - 1) * limit;
@@ -117,53 +72,20 @@ app.get("/list", async (req, res) => {
         let users = await User.find().skip(skip).limit(limit).lean();
         let totalPages = Math.ceil(totalUser / limit);
 
-        res.render("userlist", { users: users, totalPages: totalPages });
+        res.json({ users: users, totalPages: totalPages });
     } catch (e) {
         console.error(err);
         res.status(500).send("서버 오류");
     }
 });
 
-//상세페이지
-app.get("/user/:username", async (req, res) => {
+// 유저 상세페이지
+app.get("/api/users/:username", async (req, res) => {
     let username = req.params.username;
     let user = await User.findOne({ username: username }).select("-password");
     if (!user) {
         return res.status(404).send("User not found");
     }
-    res.render("person.ejs", { user: user });
+    res.json(user);
 });
 
-app.get("/edits", (req, res) => {
-    const data = [{ name: "hi", age: "hi" }];
-    res.render("edit.ejs", { data: data });
-});
-
-app.get("/edits/:username", authBytoken, (req, res) => {
-    const username = req.params.username;
-    res.render("edit.ejs", { username: username });
-});
-app.post("/edits/:username", upload.single("img1"), async (req, res) => {
-    const username = req.params.username;
-
-    try {
-        const user = await User.findOne({ username: username });
-
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
-
-        const profPicURL = req.file.location;
-
-        await User.findOneAndUpdate(
-            { username: username },
-            { profilePictureUrl: profPicURL },
-            { new: true }
-        );
-
-        res.redirect("/list");
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Internal Server Error");
-    }
-});

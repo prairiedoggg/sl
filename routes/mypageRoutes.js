@@ -13,15 +13,23 @@ const {
 } = require("../models/newUser.js");
 const mongoose = require("mongoose");
 
+
 //개인 페이지
 router.get("/", async (req, res, next) => {
-    if(!req.user){
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    console.log(req.user)
+    if (!req.user) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
-    const username = req.user.username;
-    try{
+    const email = req.user.email;
+    try {
         const user = await User.find({
-            username,
+            email,
         })
             .select("-password")
             .populate("education")
@@ -29,44 +37,45 @@ router.get("/", async (req, res, next) => {
             .populate("award")
             .populate("portfolioUrl");
         res.json(user);
-        
-        if(!user) {
-            return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
-        }
 
-    }
-    catch(err) {
+        if (!user) {
+            return next(
+                createError(
+                    "NO_RESOURCES",
+                    commonError.NO_RESOURCES.message,
+                    404
+                )
+            );
+        }
+    } catch (err) {
         next(err);
     }
-
 });
 
-//자기소개, 프로필 사진 수정
-router.patch("/", upload.single("profilePictureUrl"), async (req, res, next) => {
-
-    const username = req.user.username;
-    if(!username){
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+//자기소개 수정
+router.patch("/comments", async (req, res, next) => {
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
+
     const comments = req.body.comments;
-    if(!comments){
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
-
-    }
-    let profilePictureUrl;
-    if (req.file) {
-        profilePictureUrl = req.file.path;
+    if (!comments) {
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
 
     try {
         const user = await User.findOneAndUpdate(
-            {
-                username,
-            },
-            {
-                comments,
-                profilePictureUrl,
-            },
+            { email },
+            { comments },
             { new: true }
         );
         await user.save();
@@ -76,21 +85,75 @@ router.patch("/", upload.single("profilePictureUrl"), async (req, res, next) => 
     }
 });
 
+//프로필사진수정
+router.patch(
+    "/profile-picture",
+    upload.single("profilePictureUrl"),
+    async (req, res, next) => {
+        const email = req.user.email;
+        if (!email) {
+            return next(
+                createError(
+                    "NO_ACCESS_TOKEN",
+                    commonError.NO_ACCESS_TOKEN.message,
+                    401
+                )
+            );
+        }
+
+        let profilePictureUrl;
+        if (req.file) {
+            profilePictureUrl = req.file.path;
+        } else {
+            return next(
+                createError(
+                    "NO_RESOURCES",
+                    commonError.NO_RESOURCES.message,
+                    404
+                )
+            );
+        }
+
+        try {
+            const user = await User.findOneAndUpdate(
+                { email },
+                { profilePictureUrl },
+                { new: true }
+            );
+            await user.save();
+            res.json(user);
+        } catch (err) {
+            next(err);
+        }
+    }
+);
+
 //개인 학력 조회
 router.get("/education", async (req, res, next) => {
-    const username = req.user.username;
-    if(!username){
-        next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401))
+    const email = req.user.email;
+    if (!email) {
+        next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
     let putUser;
     try {
         putUser = await User.findOne({
-            username,
+            email,
         }).populate("education");
 
         if (!putUser) {
-            return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404))
-            ;
+            return next(
+                createError(
+                    "NO_RESOURCES",
+                    commonError.NO_RESOURCES.message,
+                    404
+                )
+            );
         }
     } catch (err) {
         next(err);
@@ -101,23 +164,63 @@ router.get("/education", async (req, res, next) => {
 
 //개인 페이지 추가 (학력)
 router.post("/education", async (req, res, next) => {
-    const username = req.user.username;
-    if(!username){
-        next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401))
+    const email = req.user.email;
+    if (!email) {
+        next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
     const { schoolName, degree, fieldOfStudy, startDate, endDate } = req.body;
 
-    if(!schoolName || !degree || !fieldOfStudy || !startDate || !endDate){
-        next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404))
+    if (!schoolName || !degree || !fieldOfStudy || !startDate || !endDate) {
+        next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
     
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+
+    // startDate가 endDate보다 빠른 날짜인지 검증
+    if (start >= end) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "시작 날짜가 종료 날짜보다 같거나 나중일 수 없습니다.",
+                400
+            )
+        );
+    }
+
+    // endDate가 현재보다 나중으로 선택되지 않도록 검증
+    if (end > now) {
+        return next(
+            createError(
+                "INVALID_END_DATE",
+                "종료 날짜는 현재 날짜보다 나중일 수 없습니다.",
+                400
+            )
+        );
+    }
+
     try {
         const user = await User.findOne({
-            username,
+            email,
         }).select("-password");
 
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         const putUser = await Education.create({
@@ -139,24 +242,67 @@ router.post("/education", async (req, res, next) => {
 
 //학력 페이지 수정
 router.patch("/education/:_id", async (req, res, next) => {
-    const username = req.user.username;
+    const email = req.user.email;
     const _id = req.params._id;
     const { schoolName, degree, fieldOfStudy, startDate, endDate } = req.body;
-    if(!username) {
-        next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401))
+    if (!email) {
+        next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
-    if(!_id || !schoolName || !degree || !fieldOfStudy || !startDate || !endDate) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+    if (
+        !_id ||
+        !schoolName ||
+        !degree ||
+        !fieldOfStudy ||
+        !startDate ||
+        !endDate
+    ) {
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
+    }
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+
+    if (start >= end) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "시작 날짜가 종료 날짜보다 같거나 나중일 수 없습니다.",
+                400
+            )
+        );
     }
 
+    if (end > now) {
+        return next(
+            createError(
+                "INVALID_END_DATE",
+                "종료 날짜는 현재 날짜보다 나중일 수 없습니다.",
+                400
+            )
+        );
+    }
     try {
         const user = await User.findOne({
-            username,
+            email,
         }).select("-password");
-        
+
         // 사용자가 존재하지 않는 경우 에러 처리
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         const updatedEducation = await Education.findOneAndUpdate(
@@ -178,7 +324,13 @@ router.patch("/education/:_id", async (req, res, next) => {
 
         // 업데이트된 교육 정보가 없는 경우(잘못된 ID 등의 이유로)
         if (!updatedEducation) {
-            return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+            return next(
+                createError(
+                    "NO_RESOURCES",
+                    commonError.NO_RESOURCES.message,
+                    404
+                )
+            );
         }
 
         res.json(updatedEducation);
@@ -187,21 +339,28 @@ router.patch("/education/:_id", async (req, res, next) => {
     }
 });
 
-
 //학력 페이지 삭제
 router.delete("/education/:_id", async (req, res, next) => {
-    const username = req.user.username;
-    if(!username) {
-        next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401))
+    const email = req.user.email;
+    if (!email) {
+        next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
     const _id = req.params._id;
-    if(!_id){
-        next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404))
+    if (!_id) {
+        next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
-    try{
+    try {
         const updateUser = await User.findOneAndUpdate(
             {
-                username: username,
+                email: email,
             },
             {
                 $pull: {
@@ -211,29 +370,52 @@ router.delete("/education/:_id", async (req, res, next) => {
             { new: true }
         );
         res.json(updateUser);
-    }
-    catch(err){
+    } catch (err) {
         next(err);
     }
 });
 
 // 자격증 정보 추가
 router.post("/certificate", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
-
+    const now = new Date();
+    const date = new Date(issueDate)
+    if (date > now) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "발급날짜가 나중일 수 없습니다.",
+                400
+            )
+        )
+    }
     const { name, issuingOrganization, issueDate } = req.body;
     if (!name || !issuingOrganization || !issueDate) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
-
+    
     try {
-        const user = await User.findOne({ username }).select("-password");
+        const user = await User.findOne({ email }).select("-password");
 
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         const putUser = await Certificate.create({
@@ -254,15 +436,27 @@ router.post("/certificate", async (req, res, next) => {
 
 // 자격증 정보 조회
 router.get("/certificate", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     try {
-        const user = await User.findOne({ username }).populate("certificate");
+        const user = await User.findOne({ email }).populate("certificate");
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         res.json(user.certificate);
@@ -273,25 +467,51 @@ router.get("/certificate", async (req, res, next) => {
 
 // 자격증 정보 수정
 router.patch("/certificate/:_id", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     const _id = req.params._id;
     if (!_id) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
 
     const { name, issuingOrganization, issueDate } = req.body;
     if (!name || !issuingOrganization || !issueDate) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
-
+    const now = new Date();
+    const date = new Date(issueDate)
+    if (date > now) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "발급날짜가 나중일 수 없습니다.",
+                400
+            )
+        )
+    }
     try {
-        const user = await User.findOne({ username }).select("-password");
+        const user = await User.findOne({ email }).select("-password");
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         await Certificate.findOneAndUpdate(
@@ -306,20 +526,28 @@ router.patch("/certificate/:_id", async (req, res, next) => {
 
 // 자격증 정보 삭제
 router.delete("/certificate/:_id", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     const _id = req.params._id;
     if (!_id) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
 
     try {
         const updateUser = await User.findOneAndUpdate(
             {
-                username: username,
+                email: email,
             },
             {
                 $pull: {
@@ -333,42 +561,77 @@ router.delete("/certificate/:_id", async (req, res, next) => {
     }
 });
 
-router.get('/award' , async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+router.get("/award", async (req, res, next) => {
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
     try {
-        const user = await User.findOne({ username }).populate("award");
+        const user = await User.findOne({ email }).populate("award");
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         res.json(user.award);
     } catch (error) {
         next(error);
     }
-
-})
+});
 // 수상 정보 추가
 router.post("/award", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     const { awardName, issuingOrganization, issueDate } = req.body;
     if (!awardName || !issuingOrganization || !issueDate) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
-
+    const now = new Date();
+    const date = new Date(issueDate)
+    if (date > now) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "발급날짜가 나중일 수 없습니다.",
+                400
+            )
+        )
+    }
     try {
         const user = await User.findOne({
-            username,
+            email,
         }).select("-password");
 
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         const putUser = await Award.create({
@@ -388,28 +651,54 @@ router.post("/award", async (req, res, next) => {
 
 //개인 수상 수정
 router.patch("/award/:_id", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     const _id = req.params._id;
     if (!_id) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
 
     const { awardName, issuingOrganization, issueDate } = req.body;
     if (!awardName || !issuingOrganization || !issueDate) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
-
+    const now = new Date();
+    const date = new Date(issueDate)
+    if (date > now) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "발급날짜가 나중일 수 없습니다.",
+                400
+            )
+        )
+    }
     try {
         const user = await User.findOne({
-            username,
+            email,
         }).select("-password");
 
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         const patchUser = await Award.findOneAndUpdate(
@@ -437,20 +726,28 @@ router.patch("/award/:_id", async (req, res, next) => {
 
 //개인 페이지 삭제
 router.delete("/award/:_id", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     const _id = req.params._id;
     if (!_id) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
 
     try {
         const updateUser = await User.findOneAndUpdate(
             {
-                username: username,
+                email: email,
             },
             {
                 $pull: {
@@ -465,18 +762,30 @@ router.delete("/award/:_id", async (req, res, next) => {
 });
 
 router.get("/portfolio", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     try {
         const putUser = await User.findOne({
-            username,
+            email,
         }).populate("portfolioUrl");
 
         if (!putUser) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         res.json(putUser);
@@ -487,28 +796,68 @@ router.get("/portfolio", async (req, res, next) => {
 
 //개인 페이지 추가 (포트폴리오)
 router.post("/portfolio", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
-    const { link } = req.body;
-    if (!link) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+    const { link, startdate, enddate } = req.body;
+    if (!link || !startdate || !enddate) {
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
+    }
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+
+    // startDate가 endDate보다 빠른 날짜인지 검증
+    if (start >= end) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "시작 날짜가 종료 날짜보다 같거나 나중일 수 없습니다.",
+                400
+            )
+        );
     }
 
+    // endDate가 현재보다 나중으로 선택되지 않도록 검증
+    if (end > now) {
+        return next(
+            createError(
+                "INVALID_END_DATE",
+                "종료 날짜는 현재 날짜보다 나중일 수 없습니다.",
+                400
+            )
+        );
+    }
     try {
         const user = await User.findOne({
-            username,
+            email,
         }).select("-password");
 
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         const putUser = await Portfolio.create({
             user: user._id,
             link,
+            startdate,
+            enddate,
         });
 
         user.portfolioUrl.push(putUser._id);
@@ -521,28 +870,69 @@ router.post("/portfolio", async (req, res, next) => {
 
 //개인 페이지 수정 (포트폴리오)
 router.patch("/portfolio/:_id", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     const _id = req.params._id;
     if (!_id) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
 
-    const { link } = req.body;
-    if (!link) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+    const { link, startdate, enddate } = req.body;
+    if (!link || !startdate || !enddate) {
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
+    }
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+
+    // startDate가 endDate보다 빠른 날짜인지 검증
+    if (start >= end) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "시작 날짜가 종료 날짜보다 같거나 나중일 수 없습니다.",
+                400
+            )
+        );
+    }
+
+    // endDate가 현재보다 나중으로 선택되지 않도록 검증
+    if (end > now) {
+        return next(
+            createError(
+                "INVALID_END_DATE",
+                "종료 날짜는 현재 날짜보다 나중일 수 없습니다.",
+                400
+            )
+        );
     }
 
     try {
         const user = await User.findOne({
-            username,
+            email,
         }).select("-password");
 
         if (!user) {
-            return next(createError('USER_NOT_FOUND', commonError.USER_NOT_FOUND.message, 404));
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
         }
 
         const patchUser = await Portfolio.findOneAndUpdate(
@@ -553,6 +943,8 @@ router.patch("/portfolio/:_id", async (req, res, next) => {
             {
                 $set: {
                     link,
+                    startdate,
+                    enddate
                 },
             },
             { new: true }
@@ -568,20 +960,28 @@ router.patch("/portfolio/:_id", async (req, res, next) => {
 
 //포트폴리오 삭제
 router.delete("/portfolio/:_id", async (req, res, next) => {
-    const username = req.user.username;
-    if (!username) {
-        return next(createError('NO_ACCESS_TOKEN', commonError.NO_ACCESS_TOKEN.message, 401));
+    const email = req.user.email;
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
 
     const _id = req.params._id;
     if (!_id) {
-        return next(createError('NO_RESOURCES', commonError.NO_RESOURCES.message, 404));
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
     }
 
     try {
         const updateUser = await User.findOneAndUpdate(
             {
-                username: username,
+                email: email,
             },
             {
                 $pull: {

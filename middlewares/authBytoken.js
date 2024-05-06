@@ -29,7 +29,8 @@ const authBytoken = async (req, res, next) => {
             );
         }
         if (error.name === "TokenExpiredError") {
-            // TODO: 숙제
+            // 토큰 만료 시 처리
+            res.clearCookie("jwt");
             next(
                 createError(
                     commonError.EXPIRED_TOKEN.name,

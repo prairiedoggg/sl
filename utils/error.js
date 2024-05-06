@@ -23,7 +23,11 @@ const commonError = {
     USER_NOT_FOUND:{
         name: "User not found",
         message: "사용자를 찾을 수 없습니다",
-    }
+    },
+    INVALID_TOKEN: {
+        name: 'INVALID_TOKEN',
+        message: '잘못된 토큰입니다.',
+    },
 };
 
 function createError(errorName, errorMessage, statusCode) {

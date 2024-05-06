@@ -8,6 +8,12 @@ const PortfolioSchema = new Schema({
     link: {
         type: String,
     },
+    startDate: {
+        type: Date,
+    },
+    endDate: {
+        type: Date,
+    },
 });
 
 module.exports = PortfolioSchema;
