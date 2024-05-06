@@ -8,7 +8,7 @@ const {
 } = require("../models/models.js");
 
 //개인 포트폴리오 조회
-router.get("/portfolio", async (req, res, next) => {
+router.get("/", async (req, res, next) => {
     const email = req.user.email;
     if (!email) {
         return next(
@@ -42,7 +42,7 @@ router.get("/portfolio", async (req, res, next) => {
 });
 
 //개인 페이지 추가 (포트폴리오)
-router.post("/portfolio", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     const email = req.user.email;
     if (!email) {
         return next(
@@ -116,7 +116,7 @@ router.post("/portfolio", async (req, res, next) => {
 });
 
 //개인 페이지 수정 (포트폴리오)
-router.patch("/portfolio/:_id", async (req, res, next) => {
+router.patch("/:_id", async (req, res, next) => {
     const email = req.user.email;
     if (!email) {
         return next(
@@ -206,7 +206,7 @@ router.patch("/portfolio/:_id", async (req, res, next) => {
 });
 
 //포트폴리오 삭제
-router.delete("/portfolio/:_id", async (req, res, next) => {
+router.delete("/:_id", async (req, res, next) => {
     const email = req.user.email;
     if (!email) {
         return next(
