@@ -48,8 +48,8 @@ const UserSchema = new Schema({
     ],
     portfolioUrl: [
         {
-            type: Schema.Types.ObjectId,
-            ref: "Portfolio",
+            data: Buffer,
+            contentType: String,    
         },
     ],
 });
