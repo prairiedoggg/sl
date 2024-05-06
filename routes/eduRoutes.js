@@ -6,7 +6,7 @@ const {
     Award,
     Portfolio,
 } = require("../models/models.js");
-const { checkToken, checkRequiredFields, checkDateRange } = require("../utils/validation");
+const { eduFieldsCheck, checkDateRange } = require("../utils/validation");
 
 
 
@@ -36,41 +36,7 @@ router.get("/", async (req, res, next) => {
 });
 
 //개인 페이지 추가 (학력)
-router.post("/", async (req, res, next) => {
-
-    const { schoolName, degree, fieldOfStudy, startDate, endDate } = req.body;
-
-    if (!schoolName || !degree || !fieldOfStudy || !startDate || !endDate) {
-        next(
-            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
-        );
-    }
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const now = new Date();
-
-    // startDate가 endDate보다 빠른 날짜인지 검증
-    if (start >= end) {
-        return next(
-            createError(
-                "INVALID_DATE_RANGE",
-                "시작 날짜가 종료 날짜보다 같거나 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
-
-    // endDate가 현재보다 나중으로 선택되지 않도록 검증
-    if (end > now) {
-        return next(
-            createError(
-                "INVALID_END_DATE",
-                "종료 날짜는 현재 날짜보다 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
+router.post("/", eduFieldsCheck, checkDateRange, async(req, res, next) => {
 
     try {
         const user = await User.findOne({
@@ -89,11 +55,11 @@ router.post("/", async (req, res, next) => {
 
         const putUser = await Education.create({
             user: user._id,
-            schoolName,
-            degree,
-            fieldOfStudy,
-            startDate,
-            endDate,
+            schoolName : req.body.schoolName,
+            degree : req.body.degree,
+            fieldOfStudy : req.body.fieldOfStudy,
+            startDate : req.body.startDate,
+            endDate : req.body.endDate,
         });
 
         user.education.push(putUser._id);
@@ -105,47 +71,12 @@ router.post("/", async (req, res, next) => {
 });
 
 //학력 페이지 수정
-router.patch("/:_id", async (req, res, next) => {
+router.patch("/:_id", eduFieldsCheck, checkDateRange, async (req, res, next) => {
     const _id = req.params._id;
-    const { schoolName, degree, fieldOfStudy, startDate, endDate } = req.body;
-    if (
-        !_id ||
-        !schoolName ||
-        !degree ||
-        !fieldOfStudy ||
-        !startDate ||
-        !endDate
-    ) {
-        return next(
-            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
-        );
-    }
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const now = new Date();
 
-    if (start >= end) {
-        return next(
-            createError(
-                "INVALID_DATE_RANGE",
-                "시작 날짜가 종료 날짜보다 같거나 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
-
-    if (end > now) {
-        return next(
-            createError(
-                "INVALID_END_DATE",
-                "종료 날짜는 현재 날짜보다 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
     try {
         const user = await User.findOne({
-            email,
+            email : req.user.email,
         }).select("-password");
 
         // 사용자가 존재하지 않는 경우 에러 처리
@@ -166,11 +97,11 @@ router.patch("/:_id", async (req, res, next) => {
             },
             {
                 $set: {
-                    schoolName,
-                    degree,
-                    fieldOfStudy,
-                    startDate,
-                    endDate,
+                    schoolName : req.body.schoolName,
+                    degree : req.body.degree,
+                    fieldOfStudy : req.body.fieldOfStudy,
+                    startDate : req.body.startDate,
+                    endDate : req.body.endDate,
                 },
             },
             { new: true }
