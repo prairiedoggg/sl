@@ -412,64 +412,7 @@ router.delete("/education/:_id", async (req, res, next) => {
     }
 });
 
-// 자격증 정보 추가
-router.post("/certificate", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
-    const now = new Date();
-    const date = new Date(issueDate);
-    if (date > now) {
-        return next(
-            createError(
-                "INVALID_DATE_RANGE",
-                "발급날짜가 나중일 수 없습니다.",
-                400
-            )
-        );
-    }
-    const { name, issuingOrganization, issueDate } = req.body;
-    if (!name || !issuingOrganization || !issueDate) {
-        return next(
-            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
-        );
-    }
 
-    try {
-        const user = await User.findOne({ email }).select("-password");
-
-        if (!user) {
-            return next(
-                createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
-                    404
-                )
-            );
-        }
-
-        const putUser = await Certificate.create({
-            user: user._id,
-            name,
-            issuingOrganization,
-            issueDate,
-        });
-
-        user.certificate.push(putUser._id);
-        await user.save();
-
-        res.status(200).json(putUser);
-    } catch (error) {
-        next(error);
-    }
-});
 
 // 자격증 정보 조회
 router.get("/certificate", async (req, res, next) => {
@@ -497,6 +440,67 @@ router.get("/certificate", async (req, res, next) => {
         }
 
         res.json(user.certificate);
+    } catch (error) {
+        next(error);
+    }
+});
+
+
+// 자격증 정보 추가
+router.post("/certificate", async (req, res, next) => {
+    const email = req.user.email;
+    
+    if (!email) {
+        return next(
+            createError(
+                "NO_ACCESS_TOKEN",
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
+    }
+
+    const { name, issuingOrganization, issueDate } = req.body;
+    if (!name || !issuingOrganization || !issueDate) {
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
+    }
+    const now = new Date();
+    const date = new Date(issueDate);
+    if (date > now) {
+        return next(
+            createError(
+                "INVALID_DATE_RANGE",
+                "발급날짜가 나중일 수 없습니다.",
+                400
+            )
+        );
+    }
+    try {
+        const user = await User.findOne({ email }).select("-password");
+
+        if (!user) {
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
+        }
+
+        const putUser = await Certificate.create({
+            user: user._id,
+            name,
+            issuingOrganization,
+            issueDate,
+        });
+
+        user.certificate.push(putUser._id);
+        await user.save();
+
+        res.status(200).json(putUser);
     } catch (error) {
         next(error);
     }
@@ -555,7 +559,7 @@ router.patch("/certificate/:_id", async (req, res, next) => {
             { _id },
             { $set: { name, issuingOrganization, issueDate } }
         );
-        res.json({ message: "자격증 정보 수정 완료" });
+        res.json(user);
     } catch (error) {
         next(error);
     }
