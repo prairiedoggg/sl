@@ -7,30 +7,30 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Koulen&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="../css/login.css" />
     <title>Sharelio Login</title>
 </head>
 
 <body>
-    <form action="">
+    <div>
         <div class="titles">
             <div class="logo">
-                <a href="#">   <!-- 로그인페이지 혹은 메인페이지로 이동 -->
-                  <img src="Logo.png" alt="포트폴리오 로고">
+                <a href="/"> <!-- 로그인페이지 혹은 메인페이지로 이동 -->
+                    <img src="../img/Logo.png" alt="포트폴리오 로고">
                 </a>
             </div>
             <p>당신의 포트폴리오를 <span>공유</span>해보세요</p>
         </div>
         <div class="input-id-password">
-            <input type="text" placeholder="Email">
-            <input type="password" placeholder="Password">
+            <input type="email" placeholder="Email" name="username">
+            <input type="password" placeholder="Password" name="password">
         </div>
         <div class="submit-buttons">
-            <input type="submit" value="로그인">
-            <input type="button" value="회원가입">
+            <input type="button" onclick="onSubmitButton()" value="로그인">
+            <input type="button" onclick="movePage()" value="회원가입">
         </div>
-    </form>
+    </div>
+    <script src="../js/login.js"></script>
 </body>
-<script src="login.js"></script>
 
 </html>

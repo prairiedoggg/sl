@@ -24,24 +24,14 @@ mongoose.connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@`
 );
 
-function checkUser(req, res, next) {
-    if (!req.user) {
-        next(createError(
-            commonError.NO_ACCESS_TOKEN.name,
-            commonError.NO_ACCESS_TOKEN.message,
-            401
-        ));
-    }
-    next();
-}
+app.use("/api/mypage", authBytoken);
+app.use("/api/mypage", require("./routes/mypageRoutes"));
 
-// api에 접근하기 위해서 토큰을 체크, req.user 체크
-app.use("/api/mypage", authBytoken, checkUser, require("./routes/mypageRoutes"));
 
 app.use("/api", newAuthRoutes);
 
-//전체 유저
-app.post("/users", authBytoken, checkUser, async (req, res) => {
+//전체 유저 테스트 용 없앨 예정
+app.post("/users", async (req, res) => {
     const { Page } = req.body;
     //const users = await User.find({}).select("-password");
     console.log(Page);
@@ -182,32 +172,18 @@ app.listen(port, () => {
 //     }
 // });
 
-app.get('/', authBytoken, (req, res) => {
-    // 토큰이 존재하지 않는다면
-    if (!req.user) {
-        res.redirect('/login');
-        return;
-    }
-    res.sendFile(__dirname + '/public/html/listpage.html');
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/ListPage/listpage.html');
 });
 
-app.get('/login', authBytoken, (req, res) => {
-    // 토큰이 존재한다면
-    if (req.user) {
-        res.redirect('/');
-        return;
-    }
-    res.sendFile(__dirname + '/public/html/login.html');
+app.get('/login', (req, res) => {
+    res.sendFile(__dirname + '/public/Login/login.html');
 });
 
 app.get('/register', (req, res) => {
-    res.sendFile(__dirname + '/public/html/register.html');
+    res.sendFile(__dirname + '/public/Register/register.html');
 });
 
-app.get('/mypage', authBytoken, (req, res) => {
-    // 토큰이 존재하지 않는다면
-    if (!req.user) {
-        res.redirect('/login');
-    }
-    res.sendFile(__dirname + '/public/html/editpage.html');
+app.get('/mypage', (req, res) => {
+    res.sendFile(__dirname + '/public/EditPage/editpage.html');
 });
