@@ -18,9 +18,9 @@ const { authBytoken } = require("../middlewares/authBytoken");
 const { commonError, createError } = require("../utils/error");
 
 // 사용자 등록
-router.post("/register", async (req, res) => {
-    const { username, password, email } = req.body;
-    console.log(username, password, email);
+router.post("/register", async (req, res, next) => {
+    const { username, password, confirmPassword, email } = req.body;
+    console.log(username, password, confirmPassword, email);
     // 사용자 이름은 특수문자 검증
     const usernameRegex = /^[a-zA-Z가-힣0-9]+$/;
     if (!usernameRegex.test(username)) {
@@ -68,10 +68,11 @@ router.post("/register", async (req, res) => {
             comments: `안녕하세요, ${username} 입니다.`,
         });
         res.json(newUser);
-    } catch (e) {
+    } catch (error) {
         // 오류 처리
-        console.error(e);
+        console.error(error);
         res.status(500).send("서버에서 오류가 발생했습니다.");
+        next(error);
     }
 });
 
