@@ -12,43 +12,8 @@ const {
     Portfolio,
 } = require("../models/newUser.js");
 const mongoose = require("mongoose");
+const multerConfig = require("../middlewares/multerConfig");
 
-// 업로드 디렉토리 설정
-const uploadDir = path.join(__dirname, "../public/uploads");
-
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-    }
-
-// multer 설정
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(
-            null,
-            file.fieldname +
-                "-" +
-                uniqueSuffix +
-                path.extname(file.originalname)
-        );
-    },
-});
-
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 1000000, // 1MB 크기 제한
-    },
-    fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return cb(new Error("이미지 파일만 업로드 가능합니다."));
-        }
-        cb(undefined, true);
-    },
-});
 
 //개인 페이지
 router.get("/", async (req, res, next) => {
@@ -124,10 +89,10 @@ router.patch("/comments", async (req, res, next) => {
 //프로필사진수정
 router.patch(
     "/profile-picture",
-    upload.single("profilePictureUrl"),
+    multerConfig.single("profilePictureUrl"),
     async (req, res, next) => {
-        const username = req.user.username;
-        if (!username) {
+        const email = req.user.email;
+        if (!email) {
             return next(
                 createError(
                     "NO_ACCESS_TOKEN",
@@ -152,8 +117,8 @@ router.patch(
 
         try {
             const user = await User.findOneAndUpdate(
-                { username },
-                { profilePictureUrl },
+                { email },
+                { profilePictureUrl : profilePictureUrl },
                 { new: true }
             );
             await user.save();
