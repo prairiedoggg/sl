@@ -1,5 +1,4 @@
 require("dotenv").config();
-require("dotenv").config();
 
 const {
     User,
@@ -26,8 +25,6 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRET_KEY;
 const refKey = process.env.REFRESH_TOKEN_SECRET_KEY;
-const { authBytoken } = require("../middlewares/authBytoken");
-const { commonError, createError } = require("../utils/error");
 const { authBytoken } = require("../middlewares/authBytoken");
 const { commonError, createError } = require("../utils/error");
 
@@ -95,9 +92,9 @@ router.post("/register", async (req, res, next) => {
     }
 });
 
-router.get("/register", (req, res) => {
-    res.render("register", { message: null });
-});
+// router.get("/register", (req, res) => {
+//     res.render("register", { message: null });
+// });
 
 // 사용자 로그인
 router.post("/login", async (req, res, next) => {
