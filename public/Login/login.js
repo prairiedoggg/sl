@@ -56,5 +56,5 @@ async function onSubmitButton() {
 
 
 function moveRegisterPage() {
-    location.href = "/register";
+    location.href = "../register/register.html";
 }

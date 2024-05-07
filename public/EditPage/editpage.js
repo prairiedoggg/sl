@@ -1,5 +1,10 @@
-// DOMContentLoaded 이벤트가 발생했을 때 실행되는 함수
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+    // 사용자 정보를 가져옴
+    const userInfo = await getUserInfo();
+    // 사용자 정보를 해당 섹션에 채움
+    if (userInfo) {
+        fillUserInfo(userInfo);
+    }
     // 모든 '추가' 버튼에 대해 이벤트 리스너 등록
     document.querySelectorAll('.add-btn').forEach(function (button) {
         button.addEventListener('click', handleAddButtonClick);
@@ -126,4 +131,41 @@ function createEditButton() {
 // 리스트 아이템을 섹션에 추가하는 함수
 function attachListItem(section, item) {
     section.querySelector('ul').appendChild(item);
+}
+//mongoDB에서 사용자의 info 가져오기
+async function getUserInfo() {
+    try {
+        const response = await fetch('/api/user'); //주소 수정필요
+        if (!response.ok) {
+            throw new Error('Failed to fetch user information');
+        }
+        const userInfo = await response.json();
+        return userInfo;
+    } catch (error) {
+        console.error('An error occurred while fetching user information:', error);
+        // 오류 처리
+        return null;
+    }
+}
+
+// 사용자 정보를 채우는 함수
+function fillUserInfo(userInfo) {
+    const userNamePlaceholder = document.getElementById('user-name-placeholder');
+    const userEmailPlaceholder = document.getElementById('user-email-placeholder');
+    userNamePlaceholder.textContent = userInfo.name;
+    userEmailPlaceholder.textContent = userInfo.email;
+    // 프로필 이미지
+    if (userInfo.profileImage) {
+        const profileImageContainer = document.querySelector('.profile-image');
+        const img = document.createElement('img');
+        img.src = userInfo.profileImage; // 이미지 URL을 설정.
+        img.alt = '프로필 이미지';
+        profileImageContainer.innerHTML = ''; // 이미지 컨테이너 내용 초기화
+        profileImageContainer.appendChild(img); // 이미지를 컨테이너에 추가합니다.
+    }
+    document.getElementById('education-info').textContent = userInfo.education;
+    document.getElementById('awards-info').textContent = userInfo.awards;
+    document.getElementById('certifications-info').textContent = userInfo.certifications;
+    document.getElementById('portfolio-info').textContent = userInfo.portfolio;
+    // 필요한 사용자 정보가 더 있으면 추가하세요.
 }

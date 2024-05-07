@@ -226,3 +226,14 @@ main {
     color: #FFFFFF;
 
 }
+.edit-done-btn{
+    background: #2DD1BD;
+    font-family: 'Inter';
+    width:100px;
+    align-self: center;
+    height:50px;
+    text-align: center;
+    color: #FFFFFF;
+    margin: 20px 0 10px 0;
+    border: none;
+}
