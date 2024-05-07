@@ -1,3 +1,8 @@
+import { createHeader } from '../components/header.js';
+
+// header 생성
+createHeader({ mode: true });
+
 //여기에 받아와야 할 것들은 뭐가 있을까
 // 이미지, 이름, 이메일, 자기소개
 // 학력정보, 자격증, 수상이력, 포트폴리오에 관한 정보

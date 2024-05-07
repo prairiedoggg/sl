@@ -31,38 +31,6 @@ body {
     min-width: 1000px;
 }
 
-/* 헤더 스타일 */
-header {
-    background-color: #fff;
-    padding: 20px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-width: 1200px;
-}
-
-header img {
-    height: 80px;
-    padding-left: 30px;
-}
-
-nav {
-    padding-right: 80px;
-}
-
-nav a {
-    color: #939393;
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 24px;
-    text-decoration: none;
-
-    color: #939393;
-    padding-right: 2vw;
-}
-
 .portfolio-section {
     border-radius: 20px;
     background-color: #2DD1BD;

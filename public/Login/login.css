@@ -77,13 +77,12 @@ body {
     justify-content: space-between;
 }
 
-.submit-buttons input:hover {
-    cursor: pointer;
+.submit-buttons button:hover {
     background-color: #8accc4;
     transition: all 0.5s;
 }
 
-.submit-buttons input {
+.submit-buttons button {
 
     background: #9DE7DE;
     border-radius: 15px;
@@ -101,6 +100,6 @@ body {
     color: #FFFFFF;
 }
 
-.submit-buttons input:focus {
+.submit-buttons button:focus {
     outline: none;
 }

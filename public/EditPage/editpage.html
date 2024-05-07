@@ -3,24 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sharelio User Edit Page</title>
-    <link rel="stylesheet" href="editpage.css">
+    <link rel="stylesheet" href="../components/header.css">
+    <link rel="stylesheet" href="../EditPage/editpage.css">
 </head>
 
 <body>
-    <header>
-        <!-- 로고 이미지 -->
-        <div class="logo-container">
-            <a href="#">
-                <img src="../img/Logo.png" alt="로고">
-            </a>
-        </div>
-        <nav>
-            <!-- 둘러보기와 로그아웃 링크 -->
-            <a href="#">둘러보기</a>
-            <a href="#">로그아웃</a>
-        </nav>
-    </header>
+    <header></header>
     <div class="container"> <!-- 전체 페이지 컨테이너 -->
         <main>
             <div class="portfolio-section">
@@ -44,7 +34,7 @@
                     <ul>
                         <li><span id="education-info"></span> <button>edit</button></li>
                     </ul>
-                    <div class="inputs">
+                    <div class="inputs" id="school">
                         <input type="text" placeholder="학교 이름">
                         <input type="text" placeholder="전공">
                         <input type="text" placeholder="재학 중/졸업">
@@ -87,13 +77,13 @@
                     </div>
                 </div>
                 <button class="edit-done-btn">수정완료</button>
-            </section>            
+            </section>
         </main>
         <footer>
             <!-- 추가적인 정보나 연락처를 여기에 추가 -->
         </footer>
     </div> <!-- .container 닫기 -->
-    <script src="editpage.js"></script>
+    <script src="../EditPage/editpage.js" type="module"></script>
 </body>
 
 </html>

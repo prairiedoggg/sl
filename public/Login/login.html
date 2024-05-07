@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Koulen&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="../Login/login.css" />
     <title>Sharelio Login</title>
 </head>
 
@@ -26,11 +26,11 @@
             <input type="password" placeholder="Password" name="password">
         </div>
         <div class="submit-buttons">
-            <input type="button" onclick="onSubmitButton()" value="로그인">
-            <input type="button" onclick="moveRegisterPage()" value="회원가입">
+            <button type="button" id="login">로그인</button>
+            <button type="button" id="register">회원가입</button>
         </div>
     </div>
-    <script src="login.js"></script>
+    <script src="./login.js" type="module"></script>
 </body>
 
 </html>

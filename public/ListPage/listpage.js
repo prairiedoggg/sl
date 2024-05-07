@@ -1,3 +1,6 @@
+import { createHeader } from '../components/header.js';
+createHeader({ mode: false });
+
 // 프로필을 그려 넣어줄 요소
 const profileZone = document.getElementById('profileZone');
 
@@ -88,5 +91,5 @@ const loadData = async function () {
 }
 
 // 스크롤 이벤트 등록
-window.addEventListener('scroll', loadData);
-window.onload = loadData;
+//window.addEventListener('scroll', loadData);
+//window.onload = loadData;

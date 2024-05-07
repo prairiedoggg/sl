@@ -1,9 +1,18 @@
+import { createHeader } from '../components/header.js';
+import { sendRequest } from '../utils/transferManager.js';
+createHeader({ mode: true });
+
+// 현재 데이터를 가져와 보여주는 부분까지는 작업을 하였으나 수정, 생성, 삭제 부분은 미완성 입니다.
+// 각 수정부분이 정확히 어딘지 알 수 있는 방법이 없어 그 부분도 수정하여야 할 듯 합니다.
+
 document.addEventListener('DOMContentLoaded', async function () {
     // 사용자 정보를 가져옴
-    const userInfo = await getUserInfo();
+    const { data } = await sendRequest('/api/mypage', {
+        Method: "GET"
+    })
     // 사용자 정보를 해당 섹션에 채움
-    if (userInfo) {
-        fillUserInfo(userInfo);
+    if (data[0]) {
+        fillUserInfo(data[0]);
     }
     // 모든 '추가' 버튼에 대해 이벤트 리스너 등록
     document.querySelectorAll('.add-btn').forEach(function (button) {
@@ -14,6 +23,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 // '추가' 버튼 클릭 시 실행되는 함수
 function handleAddButtonClick() {
     // 해당 버튼이 속한 섹션과 입력 필드를 가져옴
+    // section 부분 고민중
     const section = this.closest('.section');
     const inputsContainer = section.querySelector('.inputs');
     const inputFields = inputsContainer.querySelectorAll('input');
@@ -131,86 +141,25 @@ function createEditButton() {
 function attachListItem(section, item) {
     section.querySelector('ul').appendChild(item);
 }
-//mongoDB에서 사용자의 info 가져오기
-async function getUserInfo() {
-    try {
-        const response = await fetch('/api/user'); //주소 수정필요
-        if (!response.ok) {
-            throw new Error('Failed to fetch user information');
-        }
-        const userInfo = await response.json();
-        return userInfo;
-    } catch (error) {
-        console.error('An error occurred while fetching user information:', error);
-        // 오류 처리
-        return null;
-    }
-}
 
 // 사용자 정보를 채우는 함수
 function fillUserInfo(userInfo) {
     const userNamePlaceholder = document.getElementById('user-name-placeholder');
     const userEmailPlaceholder = document.getElementById('user-email-placeholder');
-    userNamePlaceholder.textContent = userInfo.name;
+    userNamePlaceholder.textContent = userInfo.username;
     userEmailPlaceholder.textContent = userInfo.email;
     // 프로필 이미지
-    if (userInfo.profileImage) {
+    if (userInfo.profilePictureUrl) {
         const profileImageContainer = document.querySelector('.profile-image');
         const img = document.createElement('img');
-        img.src = userInfo.profileImage; // 이미지 URL을 설정.
+        img.src = userInfo.profilePictureUrl; // 이미지 URL을 설정.
         img.alt = '프로필 이미지';
         profileImageContainer.innerHTML = ''; // 이미지 컨테이너 내용 초기화
         profileImageContainer.appendChild(img); // 이미지를 컨테이너에 추가합니다.
     }
     document.getElementById('education-info').textContent = userInfo.education;
-    document.getElementById('awards-info').textContent = userInfo.awards;
-    document.getElementById('certifications-info').textContent = userInfo.certifications;
-    document.getElementById('portfolio-info').textContent = userInfo.portfolio;
+    document.getElementById('awards-info').textContent = userInfo.award;
+    document.getElementById('certifications-info').textContent = userInfo.certificate;
+    document.getElementById('portfolio-info').textContent = userInfo.portfolioUrl;
     // 필요한 사용자 정보가 더 있으면 추가하세요.
-}
-// '완료' 버튼 클릭 시 실행되는 함수
-async function handleCompleteButtonClick() {
-    const item = this.parentNode;
-    const inputs = item.querySelectorAll('input');
-
-    const updatedUserInfo = {};
-    // 수정된 내용을 객체에 저장
-    inputs.forEach(function (input) {
-        const fieldName = input.getAttribute('data-field');
-        updatedUserInfo[fieldName] = input.value;
-    });
-
-    try {
-        // MongoDB로 수정된 사용자 정보 전송
-        await updateUserInfo(updatedUserInfo);
-        // 사용자 페이지로 이동
-        redirectToUserPage();
-    } catch (error) {
-        console.error('An error occurred while updating user information:', error);
-        // 오류 처리
-    }
-}
-
-// MongoDB에 사용자 정보를 업데이트하는 함수
-async function updateUserInfo(updatedUserInfo) {
-    try {
-        const response = await fetch('/api/user/update', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedUserInfo)
-        });
-        if (!response.ok) {
-            throw new Error('Failed to update user information');
-        }
-        // 성공적으로 업데이트된 경우 아무런 처리 없이 반환
-    } catch (error) {
-        throw new Error(error.message);
-    }
-}
-
-// 사용자 페이지로 이동하는 함수
-function redirectToUserPage() {
-    window.location.href = '/userpage'; // 사용자 페이지 URL로 변경
 }

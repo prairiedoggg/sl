@@ -1,3 +1,5 @@
+import { checkText, sendRequest } from '../utils/transferManager.js';
+
 document.addEventListener("DOMContentLoaded", function () {
   // 회원가입 버튼
   var submitButton = document.querySelector(".submit-button");
@@ -10,33 +12,24 @@ document.addEventListener("DOMContentLoaded", function () {
     var confirmPassword = document.getElementById("confirm_password").value.trim();
     var username = document.getElementById("name").value.trim();
 
-    if (email === "" || password === "" || confirmPassword !== password || username === "") {
-      alert("데이터가 모두 입력되지 않았거나 비밀번호가 일치하지 않습니다!");
-      return;
-    }
+    // 유효성 체크
+    if (!checkText({ email, password, confirmPassword, username })) return;
 
     // 회원가입 요청
-    const response = await fetch('/api/register', {
-      method: "post",
-      headers: {
-        "Content-type": "application/json"
-      },
-      body: JSON.stringify({
+    const { response, data } = sendRequest('/api/register', {
+      Method: "POST",
+      ContentType: "application/json",
+      BodyData: JSON.stringify({
         email,
         password,
         username
       })
     });
 
-    const { status } = response;
-    const { message } = await response.json().then(res => res);
-
     // 회원가입을 성공하였다면
-    if (status === 201) {
-      alert(message);
+    if (response.ok) {
+      alert(data.message);
       location.href = '/login';
-    } else {
-      alert(message);
     }
   }
 

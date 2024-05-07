@@ -1,0 +1,26 @@
+header {
+    display: flex;
+}
+
+header ol {
+    margin-left: auto;
+}
+
+header ol li {
+    display: inline-block;
+}
+
+header ol li {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+
+    color: #939393;
+    padding-right: 2vw;
+}
+
+header ol li:hover {
+    cursor: pointer;
+}
