@@ -1,5 +1,7 @@
 const router = require("express").Router();
-const { User } = require("../models/models.js");
+const { User, Reply } = require("../models/models.js");
+const { authBytoken } = require("../middlewares/authBytoken");
+const { checkToken, replyFieldsCheck } = require("../utils/validation");
 
 //페이지네이션
 router.get("/list", async (req, res) => {
@@ -35,6 +37,47 @@ router.get("/:username", async (req, res) => {
     res.json(user);
 });
 
+// 유저 댓글
+router.post("/:username", authBytoken, async (req, res, next) => {
+    const username = req.params.username;
+    try {
+        const user = await User.findOne({ username: username }).select(
+            "-password"
+        );
+        if (!user) {
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
+        }
+        const authorUser = await User.findOne({ email: req.user.email }).select("_id");
+        if (!authorUser) {
+            return next(
+                createError(
+                    "AUTHOR_NOT_FOUND",
+                    "댓글 작성자를 찾을 수 없습니다.",
+                    404
+                )
+            );
+        }
+        const reply = await Reply.create({
+            user: user._id,
+            author: authorUser._id,
+            reply: req.body.reply,
+        });
+        user.reply.push(reply._id);
+        console.log(user);
+        await user.save({ validateBeforeSave: false });
+        res.json(reply);
+    } catch (err) {
+        next(err);
+    }
+});
+
+//로그아웃
 router.post("/logout", (req, res) => {
     res.clearCookie("jwt");
     res.clearCookie("refreshToken");
@@ -42,7 +85,4 @@ router.post("/logout", (req, res) => {
     console.log("로그아웃됨");
 });
 
-
 module.exports = router;
-
-

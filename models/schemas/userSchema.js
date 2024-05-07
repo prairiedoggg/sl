@@ -52,6 +52,12 @@ const UserSchema = new Schema({
             ref: "Portfolio",
         },
     ],
+    reply: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Reply",
+        }
+    ]
 });
 
 module.exports = UserSchema;

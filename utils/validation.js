@@ -51,6 +51,16 @@ const portfolioFieldsCheck = (req, res, next) => {
 
 }
 
+const replyFieldsCheck = (req, res, next) => {
+    const { reply } = req.body;
+    if(!reply) {
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
+    }
+    next();
+}
+
 //수상, 자격증
 const checkDate = (req, res, next) => {
     const  issueDate  = req.body.issueDate;
@@ -104,5 +114,6 @@ module.exports = {
     checkDate,
     checkDateRange,
     eduFieldsCheck,
-    portfolioFieldsCheck
+    portfolioFieldsCheck,
+    replyFieldsCheck,
 };

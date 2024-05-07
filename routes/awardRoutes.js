@@ -1,10 +1,7 @@
 const router = require("express").Router();
 const {
     User,
-    Education,
-    Certificate,
     Award,
-    Portfolio,
 } = require("../models/models.js");
 const { awardCertFieldsCheck, checkDate } = require("../utils/validation");
 
