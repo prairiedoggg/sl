@@ -1,12 +1,11 @@
 const router = require("express").Router();
 const { User, Reply } = require("../models/models.js");
 const { authBytoken } = require("../middlewares/authBytoken");
-const { checkToken, replyFieldsCheck } = require("../utils/validation");
 
 //페이지네이션
-router.get("/list", async (req, res) => {
+router.get("/", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 12;
+    const limit = 12;
     const skip = (page - 1) * limit;
 
     try {
@@ -26,6 +25,7 @@ router.get("/list", async (req, res) => {
         res.status(500).send("서버 오류");
     }
 });
+
 //전체 유저
 router.get("/", async (req, res) => {
     const users = await User.find({}).select("-password");
@@ -46,9 +46,9 @@ router.get("/:username", async (req, res) => {
 router.post("/:username", authBytoken, async (req, res, next) => {
     const username = req.params.username;
     try {
-        const user = await User.findOne({ username: username }).select(
-            "-password"
-        );
+        const user = await User.findOne({ username: username })
+            .select("-password")
+            .lean();
         if (!user) {
             return next(
                 createError(
@@ -58,9 +58,9 @@ router.post("/:username", authBytoken, async (req, res, next) => {
                 )
             );
         }
-        const authorUser = await User.findOne({ email: req.user.email }).select(
-            "_id"
-        );
+        const authorUser = await User.findOne({ email: req.user.email })
+            .select("_id")
+            .lean();
         if (!authorUser) {
             return next(
                 createError(
