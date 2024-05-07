@@ -31,12 +31,8 @@ router.post("/", checkAwardCertFieldsWith("awardName"), checkDate, async (req, r
     const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
-        const user = await Award.findOne({
-            user : userId._id,
-        }).select("-password");
-
         const putUser = await Award.create({
-            user: user._id,
+            user: userId._id,
             awardName : req.body.awardName,
             issuingOrganization : req.body.issuingOrganization,
             issueDate : req.body.issueDate,
@@ -73,7 +69,7 @@ router.patch("/:_id", checkAwardCertFieldsWith("awardName"), checkDate, async (r
                 },
             },
             { new: true }
-        );
+        ).lean();
         res.json(patchUser);
     } catch (error) {
         next(error);
