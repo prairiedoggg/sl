@@ -23,32 +23,37 @@ function check(email, password) {
 // 통상적으로 이메일 비밀번호 틀리는 것은 뭘틀렸는지 안알려줌
 
 async function onSubmitButton() {
-    const email = document.getElementsByName("username")[0].value.trim();
-    const password = document.getElementsByName("password")[0].value.trim();
+    try {
+        const email = document.getElementsByName("username")[0].value.trim();
+        const password = document.getElementsByName("password")[0].value.trim();
 
-    if (check(email, password)) return;
+        if (check(email, password)) return;
 
-    const response = await fetch('/api/login', {
-        method: "post",
-        headers: {
-            "Content-type": "application/json"
-        },
-        body: JSON.stringify({
-            email,
-            password
-        })
-    });
+        const response = await fetch('/api/login', {
+            method: "post",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({
+                email,
+                password
+            })
+        });
 
-    const { status } = response;
-    const { message } = await response.json().then(res => res);
+        const { status } = response;
+        const { message } = await response.json();
 
-    console.log(response);
-    if (status === 201) {
-        location.href = '/';
-    } else {
-        alert(message);
+        console.log(response);
+        if (status === 201) {
+            location.href = '/';
+        } else {
+            alert(message);
+        }
+    } catch (error) {
+        console.error("An error occurred:", error);
     }
 }
+
 
 function moveRegisterPage() {
     location.href = "/register";

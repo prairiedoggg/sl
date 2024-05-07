@@ -39,13 +39,13 @@ body {
     color: #58E5D4;
 }
 
-.input-id-password {
+.input-group {
     display: flex;
     flex-direction: column;
     margin-bottom: 40px;
 }
 
-.input-id-password input {
+.input-group input {
     min-width: 461px;
     /* Rectangle 1 */
     background: #F2F2F2;
@@ -65,7 +65,7 @@ body {
     color: #939393;
 }
 
-.input-id-password input:focus {
+.input-group input:focus {
     outline: 2px solid #6f6d6d;
     transition: all 80ms;
 }
