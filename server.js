@@ -5,7 +5,7 @@ const { isValidObjectId } = require("mongoose");
 const app = express();
 const { User } = require("./models/models.js");
 const { authBytoken } = require("./middlewares/authBytoken");
-const newAuthRoutes = require("./routes/newAuthRoutes");
+// const newAuthRoutes = require("./routes/newAuthRoutes");
 const mypageRoutes = require("./routes/mypageRoutes");
 const userRoutes = require("./routes/userRoutes");
 const eduRoutes = require("./routes/eduRoutes");
@@ -34,7 +34,7 @@ mongoose.connect(
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", userRoutes);
-app.use("/api", newAuthRoutes);
+// app.use("/api", newAuthRoutes);
 app.use("/api/mypage", authBytoken, checkToken, mypageRoutes);
 app.use("/api/mypage/education", eduRoutes);
 app.use("/api/mypage/certificate", certRoutes);

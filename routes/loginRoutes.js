@@ -1,11 +1,13 @@
 const router = require("express").Router();
-const { User } = require("../models/newUser.js");
+const { User } = require("../models/models.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { commonError, createError } = require("../utils/error");
+const secretKey = process.env.SECRET_KEY;
+const refKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 // 사용자 로그인
-router.post("/login", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     const { username, password } = req.body;
 
     try {
