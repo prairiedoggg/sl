@@ -49,7 +49,7 @@ const UserSchema = new Schema({
     portfolioUrl: [
         {
             data: Buffer,
-            contentType: String,    
+            contentType: String,
         },
     ],
 });
