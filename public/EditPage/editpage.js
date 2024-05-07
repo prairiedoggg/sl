@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // '추가' 버튼 클릭 시 실행되는 함수
 function handleAddButtonClick() {
     // 해당 버튼이 속한 섹션과 입력 필드를 가져옴
+    // section 부분 고민중
     const section = this.closest('.section');
     const inputsContainer = section.querySelector('.inputs');
     const inputFields = inputsContainer.querySelectorAll('input');

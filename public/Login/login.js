@@ -1,25 +1,26 @@
-const form = document.getElementById("mainForm");
+// const form = document.getElementById("mainForm");
 
 function check(email, password) {
     const pattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
     if (email === "") {
         alert("이메일을 적어주세요!");
-        return true;
+        return false;
     }
     if (!pattern.test(email)) {
-        alert("이메일 형식이 올바르지 않습니다!");
-        return true;
+        alert("이메일 혹은 비밀번호가 올바르지 않습니다!");
+        return false;
     }
     if (password === "") {
         alert("비밀번호를 적어주세요!");
-        return true;
+        return false;
     }
     if ((password.length < 8) || password.length > 16) {
-        alert("비밀번호는 최소 8자리 최대 16자리 입니다!");
-        return true;
+        alert("이메일 혹은 비밀번호가 올바르지 않습니다!");
+        return false;
     }
-    return false;
+    return true;
 }
+// 통상적으로 이메일 비밀번호 틀리는 것은 뭘틀렸는지 안알려줌
 
 async function onSubmitButton() {
     const email = document.getElementsByName("username")[0].value.trim();
@@ -49,6 +50,6 @@ async function onSubmitButton() {
     }
 }
 
-function movePage() {
+function moveRegisterPage() {
     location.href = "/register";
 }
