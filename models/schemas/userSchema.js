@@ -27,37 +27,6 @@ const UserSchema = new Schema({
         type: String,
         required: true,
     },
-
-    education: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Education",
-        },
-    ],
-    award: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Award",
-        },
-    ],
-    certificate: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Certificate",
-        },
-    ],
-    portfolioUrl: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Portfolio",
-        },
-    ],
-    reply: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Reply",
-        }
-    ]
 });
 
 module.exports = UserSchema;

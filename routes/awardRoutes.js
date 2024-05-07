@@ -3,20 +3,12 @@ const {
     User,
     Award,
 } = require("../models/models.js");
-const { awardCertFieldsCheck, checkDate } = require("../utils/validation");
+const { checkToken, checkDate } = require("../utils/validation");
 
 //수상 정보 조회
 router.get("/", async (req, res, next) => {
     const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+
     try {
         const user = await User.findOne({ email }).populate("award");
         if (!user) {

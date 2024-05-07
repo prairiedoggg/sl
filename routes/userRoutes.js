@@ -5,22 +5,27 @@ const { checkToken, replyFieldsCheck } = require("../utils/validation");
 
 //페이지네이션
 router.get("/list", async (req, res) => {
-    let page = parseInt(req.query.page) || 1;
-    let limit = 12;
-    let skip = (page - 1) * limit;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
 
     try {
-        let totalUser = await User.countDocuments();
-        let users = await User.find().skip(skip).limit(limit).lean();
-        let totalPages = Math.ceil(totalUser / limit);
+        const totalUsers = await User.countDocuments();
+        const users = await User.find().skip(skip).limit(limit).lean();
+        const totalPages = Math.ceil(totalUsers / limit);
 
-        res.json({ users: users, totalPages: totalPages });
-    } catch (e) {
+        res.json({
+            currentPage: page,
+            totalPages: totalPages,
+            totalUsers: totalUsers,
+            limit: limit,
+            users: users,
+        });
+    } catch (err) {
         console.error(err);
         res.status(500).send("서버 오류");
     }
 });
-
 //전체 유저
 router.get("/", async (req, res) => {
     const users = await User.find({}).select("-password");
@@ -53,7 +58,9 @@ router.post("/:username", authBytoken, async (req, res, next) => {
                 )
             );
         }
-        const authorUser = await User.findOne({ email: req.user.email }).select("_id");
+        const authorUser = await User.findOne({ email: req.user.email }).select(
+            "_id"
+        );
         if (!authorUser) {
             return next(
                 createError(

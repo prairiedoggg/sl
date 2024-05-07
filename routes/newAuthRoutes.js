@@ -93,7 +93,7 @@ router.post("/login", async (req, res, next) => {
                 401
             );
         }
-        const payload = { email : email };
+        const payload = { _id  : user._id };
         const token = jwt.sign(payload, secretKey);
         const reftoken = jwt.sign(payload, refKey);
         console.log("🚀 ~ router.post ~ token:", token);
