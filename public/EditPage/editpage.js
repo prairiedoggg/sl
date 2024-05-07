@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 // '추가' 버튼 클릭 시 실행되는 함수
 function handleAddButtonClick() {
     // 해당 버튼이 속한 섹션과 입력 필드를 가져옴
-    // section 부분 고민중
     const section = this.closest('.section');
     const inputsContainer = section.querySelector('.inputs');
     const inputFields = inputsContainer.querySelectorAll('input');
@@ -168,4 +167,50 @@ function fillUserInfo(userInfo) {
     document.getElementById('certifications-info').textContent = userInfo.certifications;
     document.getElementById('portfolio-info').textContent = userInfo.portfolio;
     // 필요한 사용자 정보가 더 있으면 추가하세요.
+}
+// '완료' 버튼 클릭 시 실행되는 함수
+async function handleCompleteButtonClick() {
+    const item = this.parentNode;
+    const inputs = item.querySelectorAll('input');
+
+    const updatedUserInfo = {};
+    // 수정된 내용을 객체에 저장
+    inputs.forEach(function (input) {
+        const fieldName = input.getAttribute('data-field');
+        updatedUserInfo[fieldName] = input.value;
+    });
+
+    try {
+        // MongoDB로 수정된 사용자 정보 전송
+        await updateUserInfo(updatedUserInfo);
+        // 사용자 페이지로 이동
+        redirectToUserPage();
+    } catch (error) {
+        console.error('An error occurred while updating user information:', error);
+        // 오류 처리
+    }
+}
+
+// MongoDB에 사용자 정보를 업데이트하는 함수
+async function updateUserInfo(updatedUserInfo) {
+    try {
+        const response = await fetch('/api/user/update', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedUserInfo)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to update user information');
+        }
+        // 성공적으로 업데이트된 경우 아무런 처리 없이 반환
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+// 사용자 페이지로 이동하는 함수
+function redirectToUserPage() {
+    window.location.href = '/userpage'; // 사용자 페이지 URL로 변경
 }
