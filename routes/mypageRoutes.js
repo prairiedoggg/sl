@@ -10,6 +10,7 @@ const {
     Certificate,
     Award,
     Portfolio,
+    Reply,
 } = require("../models/models.js");
 const mongoose = require("mongoose");
 const multerConfig = require("../middlewares/multerConfig");
@@ -38,12 +39,13 @@ router.get("/", async (req, res, next) => {
                 )
             );
         }
-        const [education, certificate, award, portfolioUrl] = await Promise.all(
+        const [education, certificate, award, portfolioUrl, reply] = await Promise.all(
             [
                 Education.find({ user: user._id }).lean(),
                 Certificate.find({ user: user._id }).lean(),
                 Award.find({ user: user._id }).lean(),
                 Portfolio.find({ user: user._id }).lean(),
+                Reply.find({ user: user._id }).lean(),
             ]
         );
         const userData = {
@@ -52,6 +54,7 @@ router.get("/", async (req, res, next) => {
             certificate,
             award,
             portfolioUrl,
+            reply
         };
         res.json(userData);
     } catch (err) {

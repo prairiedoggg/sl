@@ -13,7 +13,7 @@ router.get("/", async (req, res, next) => {
 
     try {
         const cert = await Certificate.find({ user : userId._id}).lean();
-        if (!award) {
+        if (!cert) {
             return next(
                 createError(
                     "NO_RESOURCES",
@@ -37,7 +37,7 @@ router.post("/", checkAwardCertFieldsWith("name"), checkDate, async (req, res, n
     try {
         const user = await Certificate.findOne({ user : userId._id }).select("-password").lean();
         const putUser = await Certificate.create({
-            user: user._id,
+            user: userId._id,
             name : req.body.name,
             issuingOrganization : req.body.issuingOrganization,
             issueDate : req.body.issueDate,

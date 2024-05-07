@@ -1,6 +1,6 @@
 const { Schema } = require("mongoose");
 
-const ReplySchema = new Schema({
+const replySchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -13,12 +13,7 @@ const ReplySchema = new Schema({
     },
     reply:{
         type: String,
-        required: true,
     },
-    createdAt:{
-        type:Date,
-        default: Date.now,
-    }
 })
 
-module.exports = ReplySchema;
+module.exports = replySchema;

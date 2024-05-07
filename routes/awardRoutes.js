@@ -20,8 +20,7 @@ router.get("/", async (req, res, next) => {
                 )
             );
         }
-
-        res.json(award);
+    res.json(award);
     } catch (error) {
         next(error);
     }
@@ -90,7 +89,8 @@ router.delete("/:_id", async (req, res, next) => {
     try {
         const updateUser = await Award.findOneAndDelete(
             {
-                _id, user : userId._id
+                _id,
+                user : userId._id
             },
         );
         res.json(updateUser);

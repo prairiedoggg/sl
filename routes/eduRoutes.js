@@ -101,17 +101,13 @@ router.delete("/:_id", async (req, res, next) => {
         );
     }
     try {
-        const updateUser = await User.findOneAndUpdate(
+        const updateUser = await Education.findOneAndDelete(
             {
                 _id , user : userId._id
             },
-            {
-                $pull: {
-                    education: _id,
-                },
-            },
+
             { new: true }
-        );
+        ).lean();
         res.json(updateUser);
     } catch (err) {
         next(err);

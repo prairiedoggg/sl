@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { User, Reply } = require("../models/models.js");
 const { authBytoken } = require("../middlewares/authBytoken");
+const { commonError, createError } = require("../utils/error");
 
 //페이지네이션
 router.get("/", async (req, res) => {
@@ -59,7 +60,6 @@ router.post("/:username", authBytoken, async (req, res, next) => {
             );
         }
         const authorUser = await User.findOne({ email: req.user.email })
-            .select("_id")
             .lean();
         if (!authorUser) {
             return next(
@@ -75,9 +75,8 @@ router.post("/:username", authBytoken, async (req, res, next) => {
             author: authorUser._id,
             reply: req.body.reply,
         });
-        user.reply.push(reply._id);
         console.log(user);
-        await user.save({ validateBeforeSave: false });
+        await reply.save({ validateBeforeSave: false });
         res.json(reply);
     } catch (err) {
         next(err);
