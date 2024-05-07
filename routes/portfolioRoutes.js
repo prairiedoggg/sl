@@ -4,16 +4,18 @@ const {
     Portfolio,
 } = require("../models/models.js");
 const { portfolioFieldsCheck, checkDateRange } = require("../utils/validation");
+const { commonError, createError } = require("../utils/error");
+
 
 //개인 포트폴리오 조회
 router.get("/", async (req, res, next) => {
-
+    const userId = await User.findOne({ email : req.user.email}).lean();
     try {
-        const putUser = await User.findOne({
-            email : req.user.email,
-        }).populate("portfolioUrl");
+        const port = await Portfolio.find({
+            user : userId._id,
+        }).lean();
 
-        if (!putUser) {
+        if (!port) {
             return next(
                 createError(
                     "USER_NOT_FOUND",
@@ -23,7 +25,7 @@ router.get("/", async (req, res, next) => {
             );
         }
 
-        res.json(putUser);
+        res.json(port);
     } catch (error) {
         next(error);
     }
@@ -31,13 +33,14 @@ router.get("/", async (req, res, next) => {
 
 //개인 페이지 추가 (포트폴리오)
 router.post("/", portfolioFieldsCheck, checkDateRange, async (req, res, next) => {
+    const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
-        const user = await User.findOne({
-            email : req.user.email,
-        }).select("-password");
+        const port = await Portfolio.findOne({
+            user : userId._id,
+        }).lean();
 
-        if (!user) {
+        if (!port) {
             return next(
                 createError(
                     "USER_NOT_FOUND",
@@ -47,16 +50,15 @@ router.post("/", portfolioFieldsCheck, checkDateRange, async (req, res, next) =>
             );
         }
 
-        const putUser = await Portfolio.create({
-            user: user._id,
+        const newPort = await Portfolio.create({
+            user: userId._id,
             link: req.body.link,
             startDate : req.body.startDate,
             endDate : req.body.endDate,
         });
 
-        user.portfolioUrl.push(putUser._id);
-        await user.save();
-        res.json(putUser);
+        await newPort.save();
+        res.json(newPort);
     } catch (error) {
         next(error);
     }
@@ -64,7 +66,7 @@ router.post("/", portfolioFieldsCheck, checkDateRange, async (req, res, next) =>
 
 //개인 페이지 수정 (포트폴리오)
 router.patch("/:_id", portfolioFieldsCheck, checkDateRange, async (req, res, next) => {
-
+    const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
     if (!_id) {
         return next(
@@ -73,23 +75,9 @@ router.patch("/:_id", portfolioFieldsCheck, checkDateRange, async (req, res, nex
     }
 
     try {
-        const user = await User.findOne({
-            email: req.user.email,
-        }).select("-password");
-
-        if (!user) {
-            return next(
-                createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
-                    404
-                )
-            );
-        }
-
         const patchUser = await Portfolio.findOneAndUpdate(
             {
-                user: user._id,
+                user: userId._id,
                 _id,
             },
             {
@@ -102,8 +90,7 @@ router.patch("/:_id", portfolioFieldsCheck, checkDateRange, async (req, res, nex
             { new: true }
         );
 
-        user.portfolioUrl.push(patchUser._id);
-        await user.save();
+        await patchUser.save();
         res.json(patchUser);
     } catch (error) {
         next(error);
@@ -112,24 +99,19 @@ router.patch("/:_id", portfolioFieldsCheck, checkDateRange, async (req, res, nex
 
 //포트폴리오 삭제
 router.delete("/:_id", async (req, res, next) => {
-
+    const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
     if (!_id) {
         return next(
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
         );
     }
-
     try {
-        const updateUser = await User.findOneAndUpdate(
+        const updateUser = await Portfolio.findOneAndDelete(
             {
-                email: req.user.email,
+                _id, 
+                user : userId._id
             },
-            {
-                $pull: {
-                    portfolioUrl: _id,
-                },
-            }
         );
         res.json(updateUser);
     } catch (error) {
