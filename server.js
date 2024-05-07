@@ -12,6 +12,8 @@ const eduRoutes = require("./routes/eduRoutes");
 const certRoutes = require("./routes/certRoutes");
 const awardRoutes = require("./routes/awardRoutes");
 const portfolioRoutes = require("./routes/portfolioRoutes");
+const registerRoutes = require("./routes/registerRoutes");
+const loginRoutes = require("./routes/loginRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
 const { checkToken } = require("./utils/validation");
@@ -38,6 +40,8 @@ app.use("/api/mypage/education", eduRoutes);
 app.use("/api/mypage/certificate", certRoutes);
 app.use("/api/mypage/award", awardRoutes);
 app.use("/api/mypage/portfolio", portfolioRoutes);
+app.use("/api/register", registerRoutes);
+app.use("/api/login", loginRoutes);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
