@@ -4,7 +4,7 @@ const {
     Certificate,
 } = require("../models/models.js");
 const { createError, commonError } = require("../utils/error");
-const { awardCertFieldsCheck, checkDate } = require("../utils/validation");
+const { checkAwardCertFieldsWith, checkDate } = require("../utils/validation");
 
 // 자격증 정보 조회
 router.get("/", async (req, res, next) => {
@@ -12,8 +12,18 @@ router.get("/", async (req, res, next) => {
     const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
-        const user = await Certificate.find({ user : userId._id}).lean();
-        res.json(user);
+        const cert = await Certificate.find({ user : userId._id}).lean();
+        if (!award) {
+            return next(
+                createError(
+                    "NO_RESOURCES",
+                    commonError.NO_RESOURCES.message,
+                    404
+                )
+            );
+        }
+
+        res.json(cert);
     } catch (error) {
         next(error);
     }
@@ -21,7 +31,7 @@ router.get("/", async (req, res, next) => {
 
 
 // 자격증 정보 추가
-router.post("/", (req, res, next) => awardCertFieldsCheck(req, res, next, "name"), checkDate, async (req, res, next) => {
+router.post("/", checkAwardCertFieldsWith("name"), checkDate, async (req, res, next) => {
     const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
@@ -41,7 +51,7 @@ router.post("/", (req, res, next) => awardCertFieldsCheck(req, res, next, "name"
 });
 
 // 자격증 정보 수정
-router.patch("/:_id", (req, res, next) => awardCertFieldsCheck(req, res, next, "name"), checkDate, async (req, res, next) => {
+router.patch("/:_id", checkAwardCertFieldsWith("name"), checkDate, async (req, res, next) => {
     
     const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
@@ -55,7 +65,9 @@ router.patch("/:_id", (req, res, next) => awardCertFieldsCheck(req, res, next, "
             { user : userId._id },
             { $set: { name : req.body.name,
                     issuingOrganization : req.body.issuingOrganization, 
-                    issueDate : req.body.issueDate } }
+                    issueDate : req.body.issueDate } },
+                    { new: true }
+
         );
         res.json(newUser);
     } catch (error) {
