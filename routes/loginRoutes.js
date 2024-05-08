@@ -8,10 +8,10 @@ const refKey = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 // 사용자 로그인
 router.post("/", async (req, res, next) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ username: username });
+        const user = await User.findOne({ email: email });
         if (!user) {
             throw createError(
                 commonError.UNAUTHORIZED.name,
@@ -27,10 +27,9 @@ router.post("/", async (req, res, next) => {
                 401
             );
         }
-        const payload = { username: username };
+        const payload = { email: email };
         const token = jwt.sign(payload, secretKey);
         const reftoken = jwt.sign(payload, refKey);
-        console.log("🚀 ~ router.post ~ token:", token);
         res.cookie("refreshToken", reftoken, {
             httpOnly: true,
             maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -43,21 +42,34 @@ router.post("/", async (req, res, next) => {
 });
 
 router.post("/token", (req, res) => {
-    console.log("만료됨");
     const refreshToken = req.cookies.refreshToken;
     if (refreshToken == null) return res.sendStatus(401);
     jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET_KEY,
         (err, user) => {
-            if (err) return res.sendStatus(403);
-            const accessToken = jwt.sign(
-                { username: user.username },
-                process.env.SECRET_KEY,
-                { expiresIn: "15m" }
-            );
-            res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 10000 });
-            res.json({ accessToken });
+            if (err) {
+                return res
+                    .sendStatus(403)
+                    .json({ message: "토큰 갱신 실패. 다시 로그인 해주세요." });
+            }
+            try {
+                const accessToken = jwt.sign(
+                    { email: user.email },
+                    process.env.SECRET_KEY,
+                    { expiresIn: "15m" }
+                );
+                res.cookie("jwt", accessToken, {
+                    httpOnly: true,
+                    maxAge: 10000,
+                });
+                res.json({ accessToken });
+            } catch (error) {
+                console.log(error);
+                res.sendStatus(500).json({
+                    message: "서버 오류. 다시 시도해주세요.",
+                });
+            }
         }
     );
 });

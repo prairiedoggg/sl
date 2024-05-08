@@ -22,8 +22,6 @@ app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
 app.set("view engine", "ejs");
 app.use(express.json());
 require("dotenv").config();
-const { MongoClient, ObjectId } = require("mongodb");
-const { createError } = require("./utils/error.js");
 app.use(cookieParser());
 
 mongoose.connect(
