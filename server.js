@@ -5,7 +5,6 @@ const { isValidObjectId } = require("mongoose");
 const app = express();
 const { User } = require("./models/models.js");
 const { authBytoken } = require("./middlewares/authBytoken");
-// const newAuthRoutes = require("./routes/newAuthRoutes");
 const mypageRoutes = require("./routes/mypageRoutes");
 const userRoutes = require("./routes/userRoutes");
 const eduRoutes = require("./routes/eduRoutes");
@@ -17,6 +16,7 @@ const loginRoutes = require("./routes/loginRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
 const { checkToken } = require("./utils/validation");
+const { createError, commonError } = require("./utils/error");
 
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
 app.set("view engine", "ejs");
@@ -32,7 +32,6 @@ mongoose.connect(
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", userRoutes);
-// app.use("/api", newAuthRoutes);
 app.use("/api/mypage", authBytoken, checkToken, mypageRoutes);
 app.use("/api/mypage/education", eduRoutes);
 app.use("/api/mypage/certificate", certRoutes);
@@ -40,6 +39,15 @@ app.use("/api/mypage/award", awardRoutes);
 app.use("/api/mypage/portfolio", portfolioRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/login", loginRoutes);
+app.use((req, res, next) => {
+    next(
+        createError(
+            commonError.INVALID_API_PATH.name,
+            commonError.INVALID_API_PATH.message,
+            404
+        )
+    );
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

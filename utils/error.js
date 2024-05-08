@@ -16,17 +16,21 @@ const commonError = {
         name: "Expired token",
         message: "만료된 토큰입니다.",
     },
-    NO_RESOURCES:{
+    NO_RESOURCES: {
         name: "No resources",
         message: "리소스가 존재하지 않습니다.",
     },
-    USER_NOT_FOUND:{
+    USER_NOT_FOUND: {
         name: "User not found",
         message: "사용자를 찾을 수 없습니다",
     },
     INVALID_TOKEN: {
-        name: 'INVALID_TOKEN',
-        message: '잘못된 토큰입니다.',
+        name: "INVALID_TOKEN",
+        message: "잘못된 토큰입니다.",
+    },
+    INVALID_API_PATH: {
+        name: "INVALID_API_PATH",
+        message: "잘못된 접근입니다.",
     },
 };
 
