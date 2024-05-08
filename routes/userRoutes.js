@@ -59,8 +59,7 @@ router.post("/:username", authBytoken, async (req, res, next) => {
                 )
             );
         }
-        const authorUser = await User.findOne({ email: req.user.email })
-            .lean();
+        const authorUser = await User.findOne({ email: req.user.email }).lean();
         if (!authorUser) {
             return next(
                 createError(
@@ -75,7 +74,7 @@ router.post("/:username", authBytoken, async (req, res, next) => {
             author: authorUser._id,
             reply: req.body.reply,
         });
-        console.log(user);
+        // console.log(user);
         await reply.save({ validateBeforeSave: false });
         res.json(reply);
     } catch (err) {

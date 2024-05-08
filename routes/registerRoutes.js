@@ -6,7 +6,6 @@ const { commonError, createError } = require("../utils/error");
 // 사용자 등록
 router.post("/", async (req, res, next) => {
     const { username, password, confirmPassword, email } = req.body;
-    console.log(username, password, confirmPassword, email);
     // 사용자 이름은 특수문자 검증
     const usernameRegex = /^[a-zA-Z가-힣0-9]+$/;
     if (!usernameRegex.test(username)) {
