@@ -1,78 +1,53 @@
 const router = require("express").Router();
 const {
     User,
-    Education,
-    Certificate,
     Award,
-    Portfolio,
 } = require("../models/models.js");
-const { awardCertFieldsCheck, checkDate } = require("../utils/validation");
+const { checkAwardCertFieldsWith, checkDate } = require("../utils/validation");
+const { commonError, createError } = require("../utils/error");
 
 //수상 정보 조회
 router.get("/", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
-    }
+    const userId = await User.findOne({ email : req.user.email}).lean();
     try {
-        const user = await User.findOne({ email }).populate("award");
-        if (!user) {
+        const award = await Award.find({ user : userId._id }).lean();
+        if (!award) {
             return next(
                 createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
+                    "NO_RESOURCES",
+                    commonError.NO_RESOURCES.message,
                     404
                 )
             );
         }
-
-        res.json(user.award);
+    res.json(award);
     } catch (error) {
         next(error);
     }
 });
 // 수상 정보 추가
-router.post("/", (req, res, next) => awardCertFieldsCheck(req, res, next, "awardName"), checkDate, async (req, res, next) => {
+router.post("/", checkAwardCertFieldsWith("awardName"), checkDate, async (req, res, next) => {
+    const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
-        const user = await User.findOne({
-            email : req.user.email,
-        }).select("-password");
-
-        if (!user) {
-            return next(
-                createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
-                    404
-                )
-            );
-        }
-
         const putUser = await Award.create({
-            user: user._id,
+            user: userId._id,
             awardName : req.body.awardName,
             issuingOrganization : req.body.issuingOrganization,
             issueDate : req.body.issueDate,
         });
 
-        user.award.push(putUser._id);
-        await user.save();
-        res.json(putUser);
+        await putUser.save();
+        res.status(200).json(putUser);
     } catch (error) {
         next(error);
     }
 });
 
 //개인 수상 수정
-router.patch("/:_id", (req, res, next) => awardCertFieldsCheck(req, res, next, "awardName"), checkDate, async (req, res, next) => {
-
+router.patch("/:_id", checkAwardCertFieldsWith("awardName"), checkDate, async (req, res, next) => {
+    
+    const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
     if (!_id) {
         return next(
@@ -81,24 +56,9 @@ router.patch("/:_id", (req, res, next) => awardCertFieldsCheck(req, res, next, "
     }
 
     try {
-        const user = await User.findOne({
-            email : req.user.email,
-        }).select("-password");
-
-        if (!user) {
-            return next(
-                createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
-                    404
-                )
-            );
-        }
-
         const patchUser = await Award.findOneAndUpdate(
             {
-                user: user._id,
-                _id,
+                user: userId._id,
             },
             {
                 $set: {
@@ -108,10 +68,7 @@ router.patch("/:_id", (req, res, next) => awardCertFieldsCheck(req, res, next, "
                 },
             },
             { new: true }
-        );
-
-        user.award.push(patchUser._id);
-        await user.save();
+        ).lean();
         res.json(patchUser);
     } catch (error) {
         next(error);
@@ -120,6 +77,8 @@ router.patch("/:_id", (req, res, next) => awardCertFieldsCheck(req, res, next, "
 
 //개인 수상 페이지 삭제
 router.delete("/:_id", async (req, res, next) => {
+
+    const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
     if (!_id) {
         return next(
@@ -128,15 +87,11 @@ router.delete("/:_id", async (req, res, next) => {
     }
 
     try {
-        const updateUser = await User.findOneAndUpdate(
+        const updateUser = await Award.findOneAndDelete(
             {
-                email: req.user.email,
+                _id,
+                user : userId._id
             },
-            {
-                $pull: {
-                    award: _id,
-                },
-            }
         );
         res.json(updateUser);
     } catch (error) {

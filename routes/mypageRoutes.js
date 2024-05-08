@@ -10,6 +10,7 @@ const {
     Certificate,
     Award,
     Portfolio,
+    Reply,
 } = require("../models/models.js");
 const mongoose = require("mongoose");
 const multerConfig = require("../middlewares/multerConfig");
@@ -28,16 +29,7 @@ router.get("/", async (req, res, next) => {
     }
     const email = req.user.email;
     try {
-        const user = await User.find({
-            email,
-        })
-            .select("-password")
-            .populate("education")
-            .populate("certificate")
-            .populate("award")
-            .populate("portfolioUrl");
-        res.json(user);
-
+        const user = await User.findOne({ email }).select("-password").lean();
         if (!user) {
             return next(
                 createError(
@@ -47,6 +39,24 @@ router.get("/", async (req, res, next) => {
                 )
             );
         }
+        const [education, certificate, award, portfolioUrl, reply] = await Promise.all(
+            [
+                Education.find({ user: user._id }).lean(),
+                Certificate.find({ user: user._id }).lean(),
+                Award.find({ user: user._id }).lean(),
+                Portfolio.find({ user: user._id }).lean(),
+                Reply.find({ user: user._id }).lean(),
+            ]
+        );
+        const userData = {
+            ...user,
+            education,
+            certificate,
+            award,
+            portfolioUrl,
+            reply
+        };
+        res.json(userData);
     } catch (err) {
         next(err);
     }

@@ -2,9 +2,6 @@ const router = require("express").Router();
 const {
     User,
     Education,
-    Certificate,
-    Award,
-    Portfolio,
 } = require("../models/models.js");
 const { eduFieldsCheck, checkDateRange } = require("../utils/validation");
 
@@ -12,14 +9,14 @@ const { eduFieldsCheck, checkDateRange } = require("../utils/validation");
 
 //개인 학력 조회
 router.get("/", async (req, res, next) => {
+    const userId = await User.findOne({ email : req.user.email}).lean();
 
-    let putUser;
     try {
-        putUser = await User.findOne({
-            email:req.user.email,
-        }).populate("education");
+        const edu = await Education.find({
+            user : userId._id
+        }).lean();
 
-        if (!putUser) {
+        if (!edu) {
             return next(
                 createError(
                     "NO_RESOURCES",
@@ -28,33 +25,19 @@ router.get("/", async (req, res, next) => {
                 )
             );
         }
+        res.json(edu)
     } catch (err) {
         next(err);
     }
-
-    res.json(putUser); // 이제 putUser는 정의되었습니다.
 });
 
 //개인 페이지 추가 (학력)
 router.post("/", eduFieldsCheck, checkDateRange, async(req, res, next) => {
+    const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
-        const user = await User.findOne({
-            email:req.user.email,
-        }).select("-password");
-
-        if (!user) {
-            return next(
-                createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
-                    404
-                )
-            );
-        }
-
         const putUser = await Education.create({
-            user: user._id,
+            user: userId._id,
             schoolName : req.body.schoolName,
             degree : req.body.degree,
             fieldOfStudy : req.body.fieldOfStudy,
@@ -62,8 +45,7 @@ router.post("/", eduFieldsCheck, checkDateRange, async(req, res, next) => {
             endDate : req.body.endDate,
         });
 
-        user.education.push(putUser._id);
-        await user.save();
+        await putUser.save();
         res.json(putUser);
     } catch (err) {
         next(err);
@@ -72,27 +54,12 @@ router.post("/", eduFieldsCheck, checkDateRange, async(req, res, next) => {
 
 //학력 페이지 수정
 router.patch("/:_id", eduFieldsCheck, checkDateRange, async (req, res, next) => {
+    const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
-
     try {
-        const user = await User.findOne({
-            email : req.user.email,
-        }).select("-password");
-
-        // 사용자가 존재하지 않는 경우 에러 처리
-        if (!user) {
-            return next(
-                createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
-                    404
-                )
-            );
-        }
-
         const updatedEducation = await Education.findOneAndUpdate(
             {
-                user: user._id,
+                user: userId._id,
                 _id,
             },
             {
@@ -105,7 +72,7 @@ router.patch("/:_id", eduFieldsCheck, checkDateRange, async (req, res, next) => 
                 },
             },
             { new: true }
-        );
+        ).lean();
 
         // 업데이트된 교육 정보가 없는 경우(잘못된 ID 등의 이유로)
         if (!updatedEducation) {
@@ -126,7 +93,7 @@ router.patch("/:_id", eduFieldsCheck, checkDateRange, async (req, res, next) => 
 
 //학력 페이지 삭제
 router.delete("/:_id", async (req, res, next) => {
-
+    const userId = await User.findOne({ email: req.user.email}).lean();
     const _id = req.params._id;
     if (!_id) {
         next(
@@ -134,17 +101,13 @@ router.delete("/:_id", async (req, res, next) => {
         );
     }
     try {
-        const updateUser = await User.findOneAndUpdate(
+        const updateUser = await Education.findOneAndDelete(
             {
-                email: req.user.email,
+                _id , user : userId._id
             },
-            {
-                $pull: {
-                    education: _id,
-                },
-            },
+
             { new: true }
-        );
+        ).lean();
         res.json(updateUser);
     } catch (err) {
         next(err);

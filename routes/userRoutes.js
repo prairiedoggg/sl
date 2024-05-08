@@ -1,19 +1,27 @@
 const router = require("express").Router();
-const { User } = require("../models/models.js");
+const { User, Reply } = require("../models/models.js");
+const { authBytoken } = require("../middlewares/authBytoken");
+const { commonError, createError } = require("../utils/error");
 
 //페이지네이션
-router.get("/list", async (req, res) => {
-    let page = parseInt(req.query.page) || 1;
-    let limit = 12;
-    let skip = (page - 1) * limit;
+router.get("/", async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12;
+    const skip = (page - 1) * limit;
 
     try {
-        let totalUser = await User.countDocuments();
-        let users = await User.find().skip(skip).limit(limit).lean();
-        let totalPages = Math.ceil(totalUser / limit);
+        const totalUsers = await User.countDocuments();
+        const users = await User.find().skip(skip).limit(limit).lean();
+        const totalPages = Math.ceil(totalUsers / limit);
 
-        res.json({ users: users, totalPages: totalPages });
-    } catch (e) {
+        res.json({
+            currentPage: page,
+            totalPages: totalPages,
+            totalUsers: totalUsers,
+            limit: limit,
+            users: users,
+        });
+    } catch (err) {
         console.error(err);
         res.status(500).send("서버 오류");
     }
@@ -35,6 +43,47 @@ router.get("/:username", async (req, res) => {
     res.json(user);
 });
 
+// 유저 댓글
+router.post("/:username", authBytoken, async (req, res, next) => {
+    const username = req.params.username;
+    try {
+        const user = await User.findOne({ username: username })
+            .select("-password")
+            .lean();
+        if (!user) {
+            return next(
+                createError(
+                    "USER_NOT_FOUND",
+                    commonError.USER_NOT_FOUND.message,
+                    404
+                )
+            );
+        }
+        const authorUser = await User.findOne({ email: req.user.email })
+            .lean();
+        if (!authorUser) {
+            return next(
+                createError(
+                    "AUTHOR_NOT_FOUND",
+                    "댓글 작성자를 찾을 수 없습니다.",
+                    404
+                )
+            );
+        }
+        const reply = await Reply.create({
+            user: user._id,
+            author: authorUser._id,
+            reply: req.body.reply,
+        });
+        console.log(user);
+        await reply.save({ validateBeforeSave: false });
+        res.json(reply);
+    } catch (err) {
+        next(err);
+    }
+});
+
+//로그아웃
 router.post("/logout", (req, res) => {
     res.clearCookie("jwt");
     res.clearCookie("refreshToken");
@@ -42,7 +91,4 @@ router.post("/logout", (req, res) => {
     console.log("로그아웃됨");
 });
 
-
 module.exports = router;
-
-

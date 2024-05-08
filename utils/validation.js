@@ -51,6 +51,28 @@ const portfolioFieldsCheck = (req, res, next) => {
 
 }
 
+const checkAwardCertFieldsWith = (categoryName) => (req, res, next) => {
+    const { issuingOrganization, issueDate } = req.body;
+    const category = req.body[categoryName]; 
+    if(!category||!issuingOrganization||!issueDate) {
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        )
+    }
+    next();
+}
+
+
+const replyFieldsCheck = (req, res, next) => {
+    const { reply } = req.body;
+    if(!reply) {
+        return next(
+            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
+        );
+    }
+    next();
+}
+
 //수상, 자격증
 const checkDate = (req, res, next) => {
     const  issueDate  = req.body.issueDate;
@@ -100,9 +122,11 @@ const checkDateRange = (req, res, next) => {
 
 module.exports = {
     checkToken,
+    checkAwardCertFieldsWith,
     awardCertFieldsCheck,
     checkDate,
     checkDateRange,
     eduFieldsCheck,
-    portfolioFieldsCheck
+    portfolioFieldsCheck,
+    replyFieldsCheck,
 };

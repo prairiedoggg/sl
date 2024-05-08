@@ -1,6 +1,6 @@
 const { Schema } = require("mongoose");
 
-const PortfolioSchema = new Schema({
+const portfolioSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -16,4 +16,4 @@ const PortfolioSchema = new Schema({
     },
 });
 
-module.exports = PortfolioSchema;
+module.exports = portfolioSchema;

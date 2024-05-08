@@ -1,6 +1,6 @@
 const { Schema } = require("mongoose");
 
-const UserSchema = new Schema({
+const userSchema = new Schema({
     username: {
         type: String,
         required: true,
@@ -27,31 +27,6 @@ const UserSchema = new Schema({
         type: String,
         required: true,
     },
-
-    education: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Education",
-        },
-    ],
-    award: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Award",
-        },
-    ],
-    certificate: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Certificate",
-        },
-    ],
-    portfolioUrl: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Portfolio",
-        },
-    ],
 });
 
-module.exports = UserSchema;
+module.exports = userSchema;

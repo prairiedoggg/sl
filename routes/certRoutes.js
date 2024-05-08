@@ -1,31 +1,29 @@
 const router = require("express").Router();
 const {
     User,
-    Education,
     Certificate,
-    Award,
-    Portfolio,v
 } = require("../models/models.js");
 const { createError, commonError } = require("../utils/error");
-const { awardCertFieldsCheck, checkDate } = require("../utils/validation");
+const { checkAwardCertFieldsWith, checkDate } = require("../utils/validation");
 
 // 자격증 정보 조회
 router.get("/", async (req, res, next) => {
-
+    // 쿠키에 들어있는 이메일로 유저 아이디를 찾음
+    const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
-        const user = await User.findOne({ email : req.user.email }).populate("certificate");
-        if (!user) {
+        const cert = await Certificate.find({ user : userId._id}).lean();
+        if (!cert) {
             return next(
                 createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
+                    "NO_RESOURCES",
+                    commonError.NO_RESOURCES.message,
                     404
                 )
             );
         }
 
-        res.json(user.certificate);
+        res.json(cert);
     } catch (error) {
         next(error);
     }
@@ -33,31 +31,19 @@ router.get("/", async (req, res, next) => {
 
 
 // 자격증 정보 추가
-router.post("/", (req, res, next) => awardCertFieldsCheck(req, res, next, "name"), checkDate, async (req, res, next) => {
+router.post("/", checkAwardCertFieldsWith("name"), checkDate, async (req, res, next) => {
+    const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
-        const user = await User.findOne({ email : req.user.email }).select("-password");
-
-        if (!user) {
-            return next(
-                createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
-                    404
-                )
-            );
-        }
-
+        const user = await Certificate.findOne({ user : userId._id }).select("-password").lean();
         const putUser = await Certificate.create({
-            user: user._id,
+            user: userId._id,
             name : req.body.name,
             issuingOrganization : req.body.issuingOrganization,
             issueDate : req.body.issueDate,
         });
 
-        user.certificate.push(putUser._id);
-        await user.save();
-
+        await putUser.save();
         res.status(200).json(putUser);
     } catch (error) {
         next(error);
@@ -65,35 +51,25 @@ router.post("/", (req, res, next) => awardCertFieldsCheck(req, res, next, "name"
 });
 
 // 자격증 정보 수정
-router.patch("/:_id", (req, res, next) => awardCertFieldsCheck(req, res, next, "name"), checkDate, async (req, res, next) => {
-
+router.patch("/:_id", checkAwardCertFieldsWith("name"), checkDate, async (req, res, next) => {
+    
+    const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
     if (!_id) {
         return next(
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
         );
     }
-    console.log(req.user.email)
     try {
-        const user = await User.findOne({ email : req.user.email }).select("-password");
-
-        if (!user) {
-            return next(
-                createError(
-                    "USER_NOT_FOUND",
-                    commonError.USER_NOT_FOUND.message,
-                    404
-                )
-            );
-        }
-
-        await Certificate.findOneAndUpdate(
-            { _id },
+        const newUser = await Certificate.findOneAndUpdate(
+            { user : userId._id },
             { $set: { name : req.body.name,
                     issuingOrganization : req.body.issuingOrganization, 
-                    issueDate : req.body.issueDate } }
+                    issueDate : req.body.issueDate } },
+                    { new: true }
+
         );
-        res.json(user);
+        res.json(newUser);
     } catch (error) {
         next(error);
     }
@@ -102,6 +78,7 @@ router.patch("/:_id", (req, res, next) => awardCertFieldsCheck(req, res, next, "
 // 자격증 정보 삭제
 router.delete("/:_id", async (req, res, next) => {
 
+    const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
     if (!_id) {
         return next(
@@ -110,15 +87,8 @@ router.delete("/:_id", async (req, res, next) => {
     }
 
     try {
-        const updateUser = await User.findOneAndUpdate(
-            {
-                email: req.user.email,
-            },
-            {
-                $pull: {
-                    certificate: _id,
-                },
-            }
+        const updateUser = await Certificate.findOneAndDelete(
+            { _id, user: userId._id },
         );
         res.json(updateUser);
     } catch (error) {

@@ -1,15 +1,16 @@
 const mongoose = require("mongoose");
-const UserSchema = require("./schemas/userSchema");
-const EducationSchema = require("./schemas/educationSchema");
-const AwardSchema = require("./schemas/awardSchema");
-const PortfolioSchema = require("./schemas/portfolioSchema");
-const CertificateSchema = require("./schemas/CertificateSchema");
-const { Schema, model } = require("mongoose");
-const User = mongoose.model("User", UserSchema);
-const Education = mongoose.model("Education", EducationSchema);
-const Certificate = mongoose.model("Certificate", CertificateSchema);
-const Award = mongoose.model("Award", AwardSchema);
-const Portfolio = mongoose.model("Portfolio", PortfolioSchema);
+const userSchema = require("./schemas/userSchema");
+const educationSchema = require("./schemas/educationSchema");
+const awardSchema = require("./schemas/awardSchema");
+const portfolioSchema = require("./schemas/portfolioSchema");
+const certificateSchema = require("./schemas/certificatesSchema");
+const replySchema = require("./schemas/replySchema");
+const User = mongoose.model("User", userSchema);
+const Education = mongoose.model("Education", educationSchema);
+const Certificate = mongoose.model("Certificate", certificateSchema);
+const Award = mongoose.model("Award", awardSchema);
+const Portfolio = mongoose.model("Portfolio", portfolioSchema);
+const Reply = mongoose.model("Reply", replySchema);
 
 module.exports = {
     User,
@@ -17,4 +18,5 @@ module.exports = {
     Certificate,
     Award,
     Portfolio,
+    Reply
 };
