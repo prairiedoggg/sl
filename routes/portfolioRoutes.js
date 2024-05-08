@@ -32,7 +32,7 @@ router.get("/", async (req, res, next) => {
 });
 
 //개인 페이지 추가 (포트폴리오)
-router.post("/", portfolioFieldsCheck, checkDateRange, async (req, res, next) => {
+router.post("/",  async (req, res, next) => {
     const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
@@ -65,7 +65,7 @@ router.post("/", portfolioFieldsCheck, checkDateRange, async (req, res, next) =>
 });
 
 //개인 페이지 수정 (포트폴리오)
-router.patch("/:_id", portfolioFieldsCheck, checkDateRange, async (req, res, next) => {
+router.patch("/:_id", async (req, res, next) => {
     const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
     if (!_id) {

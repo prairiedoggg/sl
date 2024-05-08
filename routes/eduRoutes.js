@@ -32,7 +32,7 @@ router.get("/", async (req, res, next) => {
 });
 
 //개인 페이지 추가 (학력)
-router.post("/", eduFieldsCheck, checkDateRange, async(req, res, next) => {
+router.post("/", async(req, res, next) => {
     const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
@@ -53,7 +53,7 @@ router.post("/", eduFieldsCheck, checkDateRange, async(req, res, next) => {
 });
 
 //학력 페이지 수정
-router.patch("/:_id", eduFieldsCheck, checkDateRange, async (req, res, next) => {
+router.patch("/:_id", async (req, res, next) => {
     const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
     try {

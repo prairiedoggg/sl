@@ -31,7 +31,7 @@ router.get("/", async (req, res, next) => {
 
 
 // 자격증 정보 추가
-router.post("/", checkAwardCertFieldsWith("name"), checkDate, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     const userId = await User.findOne({ email : req.user.email}).lean();
 
     try {
@@ -51,7 +51,7 @@ router.post("/", checkAwardCertFieldsWith("name"), checkDate, async (req, res, n
 });
 
 // 자격증 정보 수정
-router.patch("/:_id", checkAwardCertFieldsWith("name"), checkDate, async (req, res, next) => {
+router.patch("/:_id", async (req, res, next) => {
     
     const userId = await User.findOne({ email : req.user.email}).lean();
     const _id = req.params._id;
