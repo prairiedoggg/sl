@@ -35,9 +35,15 @@ router.post("/", async (req, res, next) => {
     }
 
     try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
+        // 이메일 중복 방지
+        const existingEmail = await User.findOne({ email }).lean();
+        if (existingEmail) {
             return res.status(400).json({ message: "이미 가입된 메일입니다." });
+        }
+        // 유저 이름 중복 방지
+        const existingUsername = await User.findOne({ username }).lean();
+        if (existingUsername) {
+            return res.status(400).json({ message: "사용 중인 이름입니다." });
         }
         // 비밀번호 암호화
         const salt = await bcrypt.genSalt(10);
