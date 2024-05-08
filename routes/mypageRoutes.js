@@ -17,7 +17,6 @@ const multerConfig = require("../middlewares/multerConfig");
 
 //개인 페이지
 router.get("/", async (req, res, next) => {
-    // console.log(req.user);
     if (!req.user) {
         return next(
             createError(
