@@ -74,7 +74,6 @@ router.post("/:username", authBytoken, async (req, res, next) => {
             author: authorUser._id,
             reply: req.body.reply,
         });
-        // console.log(user);
         await reply.save({ validateBeforeSave: false });
         res.json(reply);
     } catch (err) {
