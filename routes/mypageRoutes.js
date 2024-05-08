@@ -1,6 +1,4 @@
 const router = require("express").Router();
-const { authBytoken } = require("../middlewares/authBytoken");
-const multer = require("multer");
 const path = require("path");
 const { createError, commonError } = require("../utils/error");
 const fs = require("fs");
