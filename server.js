@@ -22,7 +22,7 @@ require("dotenv").config();
 app.use(cookieParser());
 
 mongoose.connect(
-    `mongodb+srv://admin:13@shareliobackend.7wgu2k1.mongodb.net/testUser?retryWrites=true&w=majority&appName=SharelioBackEnd`
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@shareliobackend.7wgu2k1.mongodb.net/testUser?retryWrites=true&w=majority&appName=SharelioBackEnd`
 );
 
 app.use(express.urlencoded({ extended: true }));

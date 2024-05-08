@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const { User } = require("../models/models.js");
 const bcrypt = require("bcrypt");
-const { commonError, createError } = require("../utils/error");
 
 // 사용자 등록
 router.post("/", async (req, res, next) => {
@@ -15,9 +14,9 @@ router.post("/", async (req, res, next) => {
     }
     // 비밀번호 검증(특수 문자 포함)
     const passwordRegex = /^(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
-    if (password.length < 8 || !passwordRegex.test(password)) {
+    if (password.length < 4 || !passwordRegex.test(password)) {
         return res.status(400).json({
-            message: "비밀번호는 특수문자를 포함한 8자 이상어야 합니다.",
+            message: "비밀번호는 특수문자를 포함한 4자 이상어야 합니다.",
         });
     }
     // 비밀번호 일치 검증
