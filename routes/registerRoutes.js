@@ -53,10 +53,6 @@ router.post("/", async (req, res, next) => {
             profilePictureUrl:
                 "https://sharelio.s3.ap-northeast-2.amazonaws.com/tmp_gallery.png",
             comments: `안녕하세요, ${username} 입니다.`,
-            email,
-            profilePictureUrl:
-                "https://sharelio.s3.ap-northeast-2.amazonaws.com/tmp_gallery.png",
-            comments: `안녕하세요, ${username} 입니다.`,
         });
         res.json(newUser);
     } catch (error) {
