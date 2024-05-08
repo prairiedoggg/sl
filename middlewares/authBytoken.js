@@ -8,16 +8,13 @@ const authBytoken = async (req, res, next) => {
     const token = req.cookies.jwt;
     // Guard clause
     if (token === null || token === undefined) {
-        // 주석처리 한 이유는 토큰이 존재하지 않을 경우 req.user에 무엇도 넣지않고 넘기기 위함
-        // next(
-        //     createError(
-        //         commonError.NO_ACCESS_TOKEN.name,
-        //         commonError.NO_ACCESS_TOKEN.message,
-        //         401
-        //     )
-        // );
-        next();
-        return;
+        next(
+            createError(
+                commonError.NO_ACCESS_TOKEN.name,
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
     try {
         const user = await jwt.verify(token, process.env.SECRET_KEY);
