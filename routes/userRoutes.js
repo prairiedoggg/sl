@@ -4,31 +4,31 @@ const { authBytoken } = require("../middlewares/authBytoken");
 const { commonError, createError } = require("../utils/error");
 
 //페이지네이션
-// router.get("/", async (req, res) => {
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = 12;
-//     const skip = (page - 1) * limit;
+router.get("/", async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12;
+    const skip = (page - 1) * limit;
 
-//     try {
-//         const totalUsers = await User.countDocuments();
-//         const users = await User.find().skip(skip).limit(limit).lean();
-//         const totalPages = Math.ceil(totalUsers / limit);
+    try {
+        const totalUsers = await User.countDocuments();
+        const users = await User.find().skip(skip).limit(limit).lean();
+        const totalPages = Math.ceil(totalUsers / limit);
 
-//         res.json({
-//             currentPage: page,
-//             totalPages: totalPages,
-//             totalUsers: totalUsers,
-//             limit: limit,
-//             users: users,
-//         });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send("서버 오류");
-//     }
-// });
+        res.json({
+            currentPage: page,
+            totalPages: totalPages,
+            totalUsers: totalUsers,
+            limit: limit,
+            users: users,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("서버 오류");
+    }
+});
 
 //전체 유저
-router.get("/", async (req, res) => {
+router.get("/userlist", async (req, res) => {
     const users = await User.find({}).select("-password -__v");
     res.json(users);
 });
