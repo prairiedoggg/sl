@@ -1,31 +1,47 @@
-require('dotenv').config()
-const jwt = require('jsonwebtoken');
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const { commonError, createError } = require("../utils/error");
 
-const authBytoken = (req, res, next) => {
+// 이곳에서는 토큰이 존재하는지만 체크 후 존재한다면 복호화하여 req.user에 저장하여 다음 미들웨어로 전달
+
+const authBytoken = async (req, res, next) => {
     const token = req.cookies.jwt;
-    if (token) {
-        jwt.verify(token, process.env.SECRET_KEY, (err, decodetoken) =>{
-            if (err) { 
-                res.redirect('/login');
-            }
-            else {
-                console.log(decodetoken);
-                req.user = decodetoken;
-                
-                if (req.params.username !== decodetoken.username) {
-                    return res.status(403).send('접근 권한이 없습니다.')
-                }
-                
-                next();
-
-            }
-        })
+    // Guard clause
+    if (token === null || token === undefined) {
+        next(
+            createError(
+                commonError.NO_ACCESS_TOKEN.name,
+                commonError.NO_ACCESS_TOKEN.message,
+                401
+            )
+        );
     }
-    else{
-        res.redirect('/login');
+    try {
+        const user = await jwt.verify(token, process.env.SECRET_KEY);
+        req.user = user;
+        next();
+    } catch (error) {
+        if (error.name === "JsonWebTokenError") {
+            next(
+                createError(
+                    commonError.INVALID_TOKEN.name,
+                    commonError.INVALID_TOKEN.message,
+                    401
+                )
+            );
+        }
+        if (error.name === "TokenExpiredError") {
+            // 토큰 만료 시 처리
+            res.clearCookie("jwt");
+            next(
+                createError(
+                    commonError.EXPIRED_TOKEN.name,
+                    commonError.EXPIRED_TOKEN.message,
+                    401
+                )
+            );
+        }
     }
-}
-
-
+};
 
 module.exports = { authBytoken };

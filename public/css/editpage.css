@@ -1,0 +1,228 @@
+@import url('https://rsms.me/inter/inter.css');
+
+html {
+    font-family: 'Inter', sans-serif;
+}
+
+@supports (font-variation-settings: normal) {
+    html {
+        font-family: 'Inter var', sans-serif;
+    }
+}
+
+/* 전체 페이지 컨테이너 정렬 */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+    padding-top: 100px;
+}
+
+/* 전체 페이지 스타일 */
+body {
+    height: 100vh;
+    margin: 0;
+}
+
+html,
+body {
+    min-width: 1000px;
+}
+
+/* 헤더 스타일 */
+header {
+    background-color: #fff;
+    padding: 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 1200px;
+}
+
+header img {
+    height: 80px;
+    padding-left: 30px;
+}
+
+nav {
+    padding-right: 80px;
+}
+
+nav a {
+    color: #939393;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+    text-decoration: none;
+
+    color: #939393;
+    padding-right: 2vw;
+}
+
+.portfolio-section {
+    border-radius: 20px;
+    background-color: #2DD1BD;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+
+.profile-details input {
+    /* Rectangle 14 */
+
+    box-sizing: border-box;
+
+    position: absolute;
+    width: 390px;
+    height: 71px;
+
+
+    border: 1px solid #939393;
+    border-radius: 10px;
+
+}
+
+.portfolio-section h2 {
+    margin-left: auto;
+    padding-right: 16px;
+}
+
+/* 메인 섹션 스타일 */
+main {
+    text-align: center;
+    margin-left: 80px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 50px;
+    color: #606060;
+}
+
+.profile-image {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background-color: #ccc;
+    margin-left: -200px;
+    margin-right: 70px;
+
+
+}
+
+.profile-image span {
+    color: #2DD1BD;
+    text-align: center;
+    vertical-align: center;
+    font-size: 50px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.profile-details {
+    text-align: left;
+    color: rgb(58, 58, 58);
+}
+
+.profile-details h1 {
+    margin-top: 0;
+}
+
+.profile-details p {
+    margin: 5px 0;
+}
+
+.resume-details {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 1000px;
+    text-align: left;
+}
+
+.resume-details .section,
+.profile {
+    flex: 1;
+    margin-right: 20px;
+    border: 1px solid #58E5D4;
+    padding: 10px;
+    border-radius: 10px;
+    width: 1000px;
+    margin-bottom: 10px;
+}
+
+.resume-details h2 {
+    margin-top: 10px;
+    margin-left: 10px;
+    color: #2DD1BD;
+}
+
+.resume-details .inputs {
+    text-align: center;
+}
+
+.resume-details ul {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.resume-details ul li {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19px;
+
+    color: #606060;
+}
+
+
+.resume-details ul li button {
+    /*edit 버튼*/
+    background: #2DD1BD;
+    border-radius: 10px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 18px;
+    border: transparent;
+
+
+    color: #FFFFFF;
+}
+
+.resume-details input {
+    height: 30px;
+    border-radius: 10px;
+    border-color: #939393;
+}
+
+.add-btn {
+    margin-top: 20px;
+    height: 30px;
+    width: 30px;
+    background: #2DD1BD;
+    border-radius: 50%;
+    border: transparent;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 24px;
+
+    /* identical to box height */
+    text-align: center;
+    color: #FFFFFF;
+
+}
