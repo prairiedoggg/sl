@@ -35,7 +35,10 @@ router.post("/", async (req, res, next) => {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
         res.cookie("jwt", token, { httpOnly: true, maxAge: 1000 * 60 * 60 });
-        res.json(user);
+        const userResponse = user;
+        delete userResponse.password;
+        delete userResponse.__v;
+        res.json(userResponse);
     } catch (error) {
         next(error);
     }

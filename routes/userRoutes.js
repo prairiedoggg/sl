@@ -4,39 +4,41 @@ const { authBytoken } = require("../middlewares/authBytoken");
 const { commonError, createError } = require("../utils/error");
 
 //페이지네이션
-router.get("/", async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 12;
-    const skip = (page - 1) * limit;
+// router.get("/", async (req, res) => {
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = 12;
+//     const skip = (page - 1) * limit;
 
-    try {
-        const totalUsers = await User.countDocuments();
-        const users = await User.find().skip(skip).limit(limit).lean();
-        const totalPages = Math.ceil(totalUsers / limit);
+//     try {
+//         const totalUsers = await User.countDocuments();
+//         const users = await User.find().skip(skip).limit(limit).lean();
+//         const totalPages = Math.ceil(totalUsers / limit);
 
-        res.json({
-            currentPage: page,
-            totalPages: totalPages,
-            totalUsers: totalUsers,
-            limit: limit,
-            users: users,
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("서버 오류");
-    }
-});
+//         res.json({
+//             currentPage: page,
+//             totalPages: totalPages,
+//             totalUsers: totalUsers,
+//             limit: limit,
+//             users: users,
+//         });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send("서버 오류");
+//     }
+// });
 
 //전체 유저
 router.get("/", async (req, res) => {
-    const users = await User.find({}).select("-password");
+    const users = await User.find({}).select("-password -__v");
     res.json(users);
 });
 
 // 유저 상세페이지
 router.get("/:username", async (req, res) => {
     let username = req.params.username;
-    let user = await User.findOne({ username: username }).select("-password");
+    let user = await User.findOne({ username: username }).select(
+        "-password -__v"
+    );
     if (!user) {
         return res.status(404).send("User not found");
     }

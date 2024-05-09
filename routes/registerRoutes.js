@@ -58,7 +58,10 @@ router.post("/", async (req, res, next) => {
                 "https://sharelio.s3.ap-northeast-2.amazonaws.com/tmp_gallery.png",
             comments: `안녕하세요, ${username} 입니다.`,
         });
-        res.json(newUser);
+        const userResponse = newUser.toObject();
+        delete userResponse.password;
+        delete userResponse.__v;
+        res.json(userResponse);
     } catch (error) {
         // 오류 처리
         console.error(error);
