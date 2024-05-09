@@ -1,74 +1,71 @@
-import { createHeader } from '../components/header.js';
-
 // header 생성
-createHeader({ mode: true });
+createHeader({ text: "둘러보기", link: "/" });
+//아래로 위치를 봐야함
 
-//여기에 받아와야 할 것들은 뭐가 있을까
-// 이미지, 이름, 이메일, 자기소개
-// 학력정보, 자격증, 수상이력, 포트폴리오에 관한 정보
-// -> json으로 받아와서 -> 넣어주기
-//
-//
-//예시 데이터 (스키마 안보고 대충 만든거입니다)
-const userData = {
-    image: "user.jpg",
-    name: "앨리스",
-    email: "elice@naver.com",
-    intro:
-        "안녕하세요 프론트엔드 / 백엔드를 담당하고 있는 만능인재 엘리스라고 합니다",
-    education: [
-        {
-            degree: "학위",
-            major: "전공",
-            university: "학교",
-            duration: "기간",
-        },
-        // 추가 학력 정보를 필요한 만큼 추가
-    ],
-    awards: [
-        {
-            name: "수상명",
-            organization: "기관/기업명",
-            date: "수상일자",
-        },
-        // 추가 수상 이력 정보를 필요한 만큼 추가
-    ],
-    certifications: [
-        {
-            name: "자격증명",
-            issuer: "발행 기관",
-            date: "취득일자",
-        },
-        // 추가 자격증 정보를 필요한 만큼 추가
-    ],
-    // 추가 포트폴리오 정보를 필요한 만큼 추가
-};
-//한번만 받아올거라 비동기 처리 필요없어보임? 논의 필요
-// AWS에서 이미지 가져오기
-fetch("/aws_image_url_endpoint") // AWS 이미지 사용자 url (회원 id별로 다르게 가져와야함).
-    .then((response) => response.json())
-    .then((imageData) => {
-        // 이미지 설정
-        document.querySelector(
-            ".profile-image"
-        ).style.backgroundImage = `url(${imageData.imageUrl})`;
-    })
-    .catch((error) => console.error("AWS Error:", error));
-// MongoDB에서 사용자 데이터 가져오기
-fetch("/mongodb_user_data") // MongoDB 사용자 url (회원 id별로 다르게 가져와야함).
-    .then((response) => response.json())
-    .then((userData) => {
-        // 데이터 출력
-        console.log(userData);
+// 프로필 이미지를 설정하는 함수
+function setProfileImage(profileImageUrl) {
+    document.querySelector(".profile-image").style.backgroundImage = `url(${profileImageUrl})`;
+}
 
-        // 이름 설정
-        document.querySelector("h1").textContent = userData.name;
+// 사용자 데이터를 페이지에 표시하는 함수
+function displayUserData(userData) {
+    const { username, email, comments, award, certificate, education, portfolioUrl } = userData;
+    // 이름 설정
+    document.querySelector("h1").textContent = username;
 
-        // 이메일 설정
-        document.querySelector("p:nth-of-type(1)").textContent = userData.email;
+    // 이메일 설정
+    // p:nt말고 정확하게
+    document.querySelector("p:nth-of-type(1)").textContent = email;
 
-        // 자기 소개 설정
-        document.querySelector("p:nth-of-type(2)").textContent =
-            userData.introduction;
-    })
-    .catch((error) => console.error("MongoDB Error:", error));
+    // 자기 소개 설정
+    document.querySelector("p:nth-of-type(2)").textContent = comments;
+
+    // 포트폴리오 섹션의 제목 설정 (username님의 포트폴리오)
+    document.querySelector(".portfolio-section h2").textContent = `${username}님의 포트폴리오`;
+
+    // 학력 설정
+    const educationList = document.querySelector(".education ul");
+    education.forEach((education) => {
+        const listItem = document.createElement("li");
+        listItem.innerText = `${education.schoolName}, ${education.fieldOfStudy}, ${education.degree}`;
+        educationList.appendChild(listItem);
+    });
+
+    // 수상 이력 설정
+    const awardList = document.querySelector(".awards ul");
+    award.forEach((award) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${award.awardName}`;
+        awardList.appendChild(listItem);
+    });
+
+    // 자격증 설정
+    const certificationList = document.querySelector(".certifications ul");
+    certificate.forEach((certificate) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${certificate.name}`;
+        certificationList.appendChild(listItem);
+    });
+
+    // 포트폴리오 설정
+    const portfolioList = document.querySelector(".portfolio");
+    portfolioUrl.forEach((portfolio) => {
+        const portfolioItem = document.createElement("div");
+        portfolioItem.textContent = portfolio.link; // 포트폴리오의 링크를 표시하거나 다른 방식으로 표현할 수 있음
+        portfolioList.appendChild(portfolioItem);
+    });
+}
+
+
+// 페이지 초기화 함수
+async function initializePage() {
+    const username = location.href.split('/');
+    const { data } = await sendRequest(`/api/users/${username[username.length - 1]}`, {
+        Method: "GET"
+    });
+    setProfileImage(data.profilePictureUrl);
+    displayUserData(data);
+}
+
+document.addEventListener("DOMContentLoaded", initializePage);
+

@@ -1,83 +1,98 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const session = require("express-session");
-const { isValidObjectId } = require("mongoose");
 const app = express();
-const { User } = require("./models/newUser.js");
 const { authBytoken } = require("./middlewares/authBytoken");
-// const authRoutes = require("./routes/authRoutes");
-// const crudRoutes = require("./routes/crudRoutes");
-const newAuthRoutes = require("./routes/newAuthRoutes");
-// const {upload} = require("./middlewares/upload");
-
-const mockapi = require("./api/mockapi");
+const mypageRoutes = require("./routes/mypageRoutes");
+const userRoutes = require("./routes/userRoutes");
+const eduRoutes = require("./routes/eduRoutes");
+const certRoutes = require("./routes/certRoutes");
+const awardRoutes = require("./routes/awardRoutes");
+const portfolioRoutes = require("./routes/portfolioRoutes");
+const registerRoutes = require("./routes/registerRoutes");
+const loginRoutes = require("./routes/loginRoutes");
+const errorHandler = require("./middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
+const { checkToken } = require("./utils/validation");
+const { createError, commonError } = require("./utils/error");
+const { User } = require("./models/models");
+const jwt = require("jsonwebtoken");
+
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
-app.set("view engine", "ejs");
+//app.set("view engine", "ejs");
 app.use(express.json());
 require("dotenv").config();
-const { MongoClient, ObjectId } = require("mongodb");
-const { createError } = require("./utils/error.js");
 app.use(cookieParser());
 
 mongoose.connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@`
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@cluster0.qhijdtt.mongodb.net/`
 );
 
-app.use("/api/mypage", authBytoken);
-app.use("/api/mypage", require("./routes/mypageRoutes"));
-
-
-app.use("/api", newAuthRoutes);
-
-//전체 유저 테스트 용 없앨 예정
-app.post("/users", async (req, res) => {
-    const { Page } = req.body;
-    //const users = await User.find({}).select("-password");
-    console.log(Page);
-    const users = await User.find({}).skip(12 * (Page === 0 ? 0 : Page)).limit(12);
-    console.log("🚀 ~ router.get ~ users:", users);
-    res.json(users);
-});
-
-
-app.use(express.urlencoded({ extended: true }));
-app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
-
-// //이미지 세팅
-// const multer = require("multer");
-// const upload = multer({
-//     limits: {
-//         fileSize: 1000000 // 1MB 크기 제한
-//     },
-//     fileFilter(req, file, cb) {
-//         if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-//             return cb(new Error('이미지 파일만 업로드 가능합니다.'));
-//         }
-//         cb(undefined, true);
-//     }
-// });
-
-//app.use("/", mockapi);
-
-app.use((error, req, res, next) => {
-    const { name, message, statusCode } = error;
-
-    if (statusCode >= 500 || statusCode === undefined) {
-        console.error(name, message);
-        res.statusCode = 500;
-        res.json({
-            error: "서버에서 에러가 발생하였습니다. 자세한 내용은 개발자에게 문의해주세요.",
-            data: null,
-        });
+async function tokenCheck(req, res, next) {
+    const token = req.cookies.jwt;
+    if (token === null || token === undefined) {
+        next();
         return;
     }
+    req.user = jwt.verify(token, process.env.SECRET_KEY);
+    next();
+}
 
-    res.statusCode = statusCode;
-    res.json({
-        error: message,
-        data: null,
-    });
+app.use(express.urlencoded({ extended: true }));
+app.use("/api/users", userRoutes);
+app.use("/api/mypage", authBytoken, checkToken, mypageRoutes);
+app.use("/api/mypage/education", eduRoutes);
+app.use("/api/mypage/certificate", certRoutes);
+app.use("/api/mypage/award", awardRoutes);
+app.use("/api/mypage/portfolio", portfolioRoutes);
+app.use("/api/register", registerRoutes);
+app.use("/api/login", loginRoutes);
+
+app.get('/', tokenCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect('/login');
+        return;
+    }
+    res.sendFile(__dirname + '/public/ListPage/listpage.html');
+});
+
+app.get('/login', tokenCheck, (req, res) => {
+    if (req.user) {
+        res.redirect('/');
+    }
+    res.sendFile(__dirname + '/public/Login/login.html');
+});
+
+app.get('/register', (req, res) => {
+    if (req.user) {
+        res.redirect('/');
+    }
+    res.sendFile(__dirname + '/public/Register/register.html');
+});
+
+app.get('/mypage', tokenCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect('/login');
+        return;
+    }
+    res.sendFile(__dirname + '/public/EditPage/editpage.html');
+});
+
+app.get('/userpage/:username', tokenCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect('/login');
+        return;
+    }
+    res.sendFile(__dirname + '/public/UserPage/userpage.html');
+});
+
+app.use((req, res, next) => {
+    next(
+        createError(
+            commonError.INVALID_API_PATH.name,
+            commonError.INVALID_API_PATH.message,
+            404
+        )
+    );
 });
 
 const port = process.env.PORT || 3000;
@@ -85,105 +100,5 @@ app.listen(port, () => {
     console.log(`http://localhost:3000/`);
 });
 
-// app.get("/", (req, res) => {
-//     res.render("main.ejs");
-// });
-
-// app.get("/write", authBytoken, (req, res) => {
-//     res.render("write.ejs");
-// });
-// app.post("/add", async (req, res) => {
-//     console.log(req.body);
-
-//     try {
-//         if (req.body.title == "") {
-//             res.send("제목없음");
-//         } else {
-//             await db.collection("post").insertOne({
-//                 title: req.body.title,
-//                 content: req.body.content,
-//             });
-//             res.redirect("/list");
-//         }
-//     } catch (e) {
-//         console.log(e); // 콘솔창에 에러가 났다는 것을 알리기 위함
-//         res.status(500).send("server error");
-//     } //500은 서버의 잘못으로 인한 에러라는 뜻임
-// });
-
-// app.get("/list", async (req, res) => {
-//     let page = parseInt(req.query.page) || 1;
-//     let limit = 12;
-//     let skip = (page - 1) * limit;
-
-//     try {
-//         let totalUser = await User.countDocuments();
-//         let users = await User.find().skip(skip).limit(limit).lean();
-//         let totalPages = Math.ceil(totalUser / limit);
-
-//         res.render("userlist", { users: users, totalPages: totalPages });
-//     } catch (e) {
-//         console.error(err);
-//         res.status(500).send("서버 오류");
-//     }
-// });
-
-// //상세페이지
-// app.get("/user/:username", async (req, res) => {
-//     let username = req.params.username;
-//     let user = await User.findOne({ username: username }).select("-password");
-//     if (!user) {
-//         return res.status(404).send("User not found");
-//     }
-//     res.render("person.ejs", { user: user });
-// });
-
-// app.get("/edits", (req, res) => {
-//     const data = [{ name: "hi", age: "hi" }];
-//     res.render("edit.ejs", { data: data });
-// });
-
-// app.get("/edits/:username", authBytoken, (req, res) => {
-//     const username = req.params.username;
-//     res.render("edit.ejs", { username: username });
-// });
-// app.post("/edits/:username", upload.single("img1"), async (req, res) => {
-//     const username = req.params.username;
-
-//     try {
-//         const user = await User.findOne({ username: username });
-
-//         if (!user) {
-//             return res.status(404).send("User not found");
-//         }
-
-//         const profPicURL = req.file.location;
-
-//         await User.findOneAndUpdate(
-//             { username: username },
-//             { profilePictureUrl: profPicURL },
-//             { new: true }
-//         );
-
-//         res.redirect("/list");
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send("Internal Server Error");
-//     }
-// });
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/ListPage/listpage.html');
-});
-
-app.get('/login', (req, res) => {
-    res.sendFile(__dirname + '/public/Login/login.html');
-});
-
-app.get('/register', (req, res) => {
-    res.sendFile(__dirname + '/public/Register/register.html');
-});
-
-app.get('/mypage', (req, res) => {
-    res.sendFile(__dirname + '/public/EditPage/editpage.html');
-});
+//에러핸들러
+app.use(errorHandler);

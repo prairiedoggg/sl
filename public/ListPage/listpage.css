@@ -10,7 +10,6 @@ ol li {
     display: inline-block;
 }
 
-
 ol {
     margin-left: auto;
 }
@@ -21,7 +20,6 @@ ol li {
     font-weight: 600;
     font-size: 20px;
     line-height: 24px;
-
     color: #939393;
     padding-right: 2vw;
 }
@@ -38,7 +36,6 @@ ol li:hover {
     margin-right: auto;
     background: #58E5D4;
     border-radius: 20px;
-
 }
 
 .category_text {
@@ -51,8 +48,28 @@ ol li:hover {
     font-weight: 600;
     font-size: 40px;
     line-height: 19px;
-
     color: white;
+}
+
+.filtering {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.filtering ul li {
+    display: inline-block;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 24px;
+    color: #939393;
+    padding-right: 1vw;
+}
+
+.filtering ul li:hover {
+    cursor: pointer;
 }
 
 .profile_zone {
@@ -72,7 +89,8 @@ ol li:hover {
     border: 2px solid #939393;
     border-radius: 20px;
     margin-top: 15px;
-    margin-left: 0.5vw;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .profile_image {
@@ -95,9 +113,61 @@ ol li:hover {
     color: #606060;
 }
 
-#end {
-    visibility: hidden;
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pagination li {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.pagination li a,
+.pagination li span {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #eee;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.pagination li.active a,
+.pagination li.active span {
+    background-color: #58E5D4;
+    color: white;
+}
+
+.pagination span.arrow {
+    font-size: 20px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.pagination .page-btn{
+    border: none;
+    background-color: transparent;
+}
+
+.pagination .page-btn{
+    border: none;
+    background-color: transparent;
+}
+
+.pagination .page-btn, .pagination span{
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+    color: #939393;
+    padding-right: 2vw;
+    
 }

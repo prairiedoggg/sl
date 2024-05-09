@@ -1,12 +1,10 @@
-import { sendRequest } from "../utils/transferManager.js";
-
 function move(link) {
     location.href = link;
 }
 
 async function userLogout() {
-    const { response } = await sendRequest('/api/logout', {
-        Method: "POST"
+    const { response } = await sendRequest("/api/users/logout", {
+        Method: "POST",
     });
     if (response.ok) {
         alert("계정이 로그아웃 되셨습니다!");
@@ -14,8 +12,8 @@ async function userLogout() {
     }
 }
 
-export function createHeader(page) {
-    const { mode } = page;
+function createHeader(data) {
+    const { text, link } = data;
     const header = document.querySelector('header');
     const headerImg = document.createElement('img');
     const ol = document.createElement('ol');
@@ -25,18 +23,10 @@ export function createHeader(page) {
     const linkButton = document.createElement('li');
     const logout = document.createElement('li');
 
-    if (mode) {
-        linkButton.onclick = () => { move('/') };
-    } else {
-        linkButton.onclick = () => { move('/mypage') };
-    }
+    linkButton.onclick = () => { move(link) };
     logout.onclick = userLogout;
 
-    if (mode) {
-        linkButton.innerText = "홈으로"
-    } else {
-        linkButton.innerText = "내 프로필"
-    }
+    linkButton.innerText = text;
     logout.innerText = "로그아웃";
 
     ol.appendChild(linkButton);

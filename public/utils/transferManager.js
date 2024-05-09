@@ -1,5 +1,5 @@
 // 유효성 체크
-export function checkText(text) {
+function checkText(text) {
     const { email, password, username, confirmPassword } = text;
     if (email !== undefined) {
         const pattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
@@ -48,15 +48,15 @@ export function checkText(text) {
 }
 
 // 데이터 전송 및 에러처리
-export async function sendRequest(URL, header) {
+async function sendRequest(URL, header) {
     try {
-        const { Method, ContentType, BodyData } = header;
+        const { Method, ContentType, BodyData, ResponseError } = header;
         const response = await fetch(URL, {
             method: Method,
             headers: {
-                "Content-Type": ContentType ? ContentType : "Multipart / related"
+                "Content-Type": (ContentType ? ContentType : "Multipart / related")
             },
-            body: BodyData ? BodyData : undefined
+            body: (BodyData ? BodyData : undefined)
         });
 
         // json 데이터가 존재하는지 확인하고 에러가 발생했다면 undefined
@@ -67,10 +67,17 @@ export async function sendRequest(URL, header) {
             const { message } = data;
             alert(message);
         }
+        // 정상적이 응답이 아니고 Error Code 400 미만인경우
+        else if (!response.ok && response.status < 400) {
+            throw new Error(ResponseError ? ResponseError : response.status);
+        }
+        // Error Code 400 이상인경우
+        else if (!response.ok && response.status >= 400) {
+            throw new Error(`${response.status} : 서버와 연결을 실패 하였습니다!`);
+        }
         return { response, data };
     } catch (ErrorMessage) {
-        alert(ErrorMessage);
-        throw new Error(ErrorMessage);
+        console.log(ErrorMessage);
     }
 }
 

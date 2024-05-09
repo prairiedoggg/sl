@@ -23,7 +23,7 @@ html {
 /* 전체 페이지 스타일 */
 body {
     height: 100vh;
-    margin: 0;
+    margin: 8px;
 }
 
 html,
@@ -58,6 +58,11 @@ body {
 
 }
 
+.profile-details div {
+    margin-top: 15px;
+    ;
+}
+
 .portfolio-section h2 {
     margin-left: auto;
     padding-right: 16px;
@@ -84,17 +89,30 @@ main {
     background-color: #ccc;
     margin-left: -200px;
     margin-right: 70px;
-
+    display: flex;
+    overflow: hidden;
+    background-size: cover;
 
 }
 
-.profile-image span {
-    color: #2DD1BD;
-    text-align: center;
-    vertical-align: center;
-    font-size: 50px;
-    margin-top: auto;
-    margin-bottom: auto;
+
+/* label 스타일 조정 */
+.profile-image .button {
+    display: flex;
+    justify-content: center;
+}
+
+.profile-image label {
+    cursor: pointer;
+    font-size: 1em;
+    line-height: 250px;
+    color: #fff;
+
+}
+
+/* 못생긴 기존 input 숨기기 */
+.profile-image #chooseFile {
+    visibility: hidden;
 }
 
 .profile-details {
@@ -156,7 +174,8 @@ main {
 }
 
 
-.resume-details ul li button {
+.resume-details ul li button,
+.profile-edit-btn {
     /*edit 버튼*/
     background: #2DD1BD;
     border-radius: 10px;
@@ -193,16 +212,4 @@ main {
     text-align: center;
     color: #FFFFFF;
 
-}
-
-.edit-done-btn {
-    background: #2DD1BD;
-    font-family: 'Inter';
-    width: 100px;
-    align-self: center;
-    height: 50px;
-    text-align: center;
-    color: #FFFFFF;
-    margin: 20px 0 10px 0;
-    border: none;
 }

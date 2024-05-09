@@ -1,9 +1,8 @@
-import { checkText, sendRequest } from '../utils/transferManager.js';
-
 // 버튼 클릭 이벤트 설정
 document.getElementById('login').addEventListener('click', onSubmitButton);
 document.getElementById('register').addEventListener('click', movePage);
 
+// 로그인
 async function onSubmitButton() {
     const email = document.getElementsByName("username")[0].value.trim();
     const password = document.getElementsByName("password")[0].value.trim();
@@ -21,6 +20,7 @@ async function onSubmitButton() {
     }
 }
 
+// 회원가입 페이지로 이동
 function movePage() {
     location.href = "/register";
 }

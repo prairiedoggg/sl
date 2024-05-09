@@ -1,5 +1,3 @@
-import { checkText, sendRequest } from '../utils/transferManager.js';
-
 document.addEventListener("DOMContentLoaded", function () {
   // 회원가입 버튼
   var submitButton = document.querySelector(".submit-button");
@@ -22,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
       BodyData: JSON.stringify({
         email,
         password,
+        confirmPassword,
         username
       })
     });

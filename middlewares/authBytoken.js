@@ -2,6 +2,8 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { commonError, createError } = require("../utils/error");
 
+// 이곳에서는 토큰이 존재하는지만 체크 후 존재한다면 복호화하여 req.user에 저장하여 다음 미들웨어로 전달
+
 const authBytoken = async (req, res, next) => {
     const token = req.cookies.jwt;
     // Guard clause
@@ -29,7 +31,8 @@ const authBytoken = async (req, res, next) => {
             );
         }
         if (error.name === "TokenExpiredError") {
-            // TODO: 숙제
+            // 토큰 만료 시 처리
+            res.clearCookie("jwt");
             next(
                 createError(
                     commonError.EXPIRED_TOKEN.name,

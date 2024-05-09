@@ -1,12 +1,74 @@
-import { createHeader } from '../components/header.js';
+// 더미 데이터
+const dummyData = [
+    { 
+        name: 'Alice', 
+        email: 'alice@example.com', 
+        comment: '안녕하세요!', 
+        profilePictureUrl: 'https://example.com/profiles/alice.jpg' // 예시 URL
+    },
+    { 
+        name: 'Bob', 
+        email: 'bob@example.com', 
+        comment: '잘 부탁드립니다.', 
+        profilePictureUrl: 'https://example.com/profiles/bob.jpg' // 예시 URL
+    },
+    { 
+        name: 'Charlie', 
+        email: 'charlie@example.com', 
+        comment: '반갑습니다.', 
+        profilePictureUrl: 'https://example.com/profiles/charlie.jpg' // 예시 URL
+    },
+    { 
+        name: 'David', 
+        email: 'david@example.com', 
+        comment: '안녕하세요!', 
+        profilePictureUrl: 'https://example.com/profiles/david.jpg' // 예시 URL
+    },
+    { 
+        name: 'Emma', 
+        email: 'emma@example.com', 
+        comment: '잘 부탁드립니다.', 
+        profilePictureUrl: 'https://example.com/profiles/emma.jpg' // 예시 URL
+    },
+    { 
+        name: 'Frank', 
+        email: 'frank@example.com', 
+        comment: '반갑습니다.', 
+        profilePictureUrl: 'https://example.com/profiles/frank.jpg' // 예시 URL
+    },
+    { 
+        name: 'Grace', 
+        email: 'grace@example.com', 
+        comment: '안녕하세요!', 
+        profilePictureUrl: 'https://example.com/profiles/grace.jpg' // 예시 URL
+    },
+    { 
+        name: 'Henry', 
+        email: 'henry@example.com', 
+        comment: '잘 부탁드립니다.', 
+        profilePictureUrl: 'https://example.com/profiles/henry.jpg' // 예시 URL
+    },
+    { 
+        name: 'Isabella', 
+        email: 'isabella@example.com', 
+        comment: '반갑습니다.', 
+        profilePictureUrl: 'https://example.com/profiles/isabella.jpg' // 예시 URL
+    },
+    { 
+        name: 'Jack', 
+        email: 'jack@example.com', 
+        comment: '안녕하세요!', 
+        profilePictureUrl: 'https://example.com/profiles/jack.jpg' // 예시 URL
+    },
+];
 
-// header 생성
-createHeader({ mode: true });
+
 
 const pageSize = 12; // 페이지당 프로필 수
 let currentPage = 1; // 현재 페이지
-let totalPages = 1; // 전체 페이지 수 초기값 설정
+let totalPages = Math.ceil(dummyData.length / pageSize); // 전체 페이지 수
 
+// 프로필 카드를 생성하는 함수
 // 프로필 카드를 생성하는 함수
 function createProfileCard(profile) {
     const profileCard = document.createElement('div');
@@ -47,33 +109,17 @@ function createProfileCard(profile) {
 }
 
 
+
 // 페이지 로드 시 프로필 데이터를 가져와서 프로필 카드를 추가
 document.addEventListener('DOMContentLoaded', () => {
-    fetchProfiles(currentPage);
+    renderProfiles();
 });
-
-// 서버로부터 프로필 데이터를 가져오는 함수
-async function fetchProfiles(page) {
-    try {
-        const response = await fetch(`/api/profiles?page=${page}`); // 서버에서 데이터를 가져오는 API 엔드포인트
-        if (!response.ok) {
-            throw new Error('서버로부터 데이터를 가져오는 데 실패했습니다.');
-        }
-        const { currentPage, totalPages, profiles } = await response.json();
-        currentPage = currentPage;
-        totalPages = totalPages;
-
-        renderProfiles(profiles);
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 // 이전 페이지로 이동
 function prevPage() {
     if (currentPage > 1) {
         currentPage--;
-        fetchProfiles(currentPage);
+        renderProfiles();
     }
 }
 
@@ -81,19 +127,22 @@ function prevPage() {
 function nextPage() {
     if (currentPage < totalPages) {
         currentPage++;
-        fetchProfiles(currentPage);
+        renderProfiles();
     }
 }
 
 // 프로필 카드 렌더링
-function renderProfiles(profiles) {
+function renderProfiles() {
     const profileZone = document.getElementById('profileZone');
     profileZone.innerHTML = '';
 
-    profiles.forEach(profile => {
-        const profileCard = createProfileCard(profile);
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, dummyData.length);
+
+    for (let i = startIndex; i < endIndex; i++) {
+        const profileCard = createProfileCard(dummyData[i]);
         profileZone.appendChild(profileCard);
-    });
+    }
 
     updatePagination();
 }
