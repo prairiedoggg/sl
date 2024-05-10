@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!checkText({ email, password, confirmPassword, username })) return;
 
     // 회원가입 요청
-    const { response, data } = sendRequest('/api/register', {
+    const { response } = await sendRequest('/api/register', {
       Method: "POST",
       ContentType: "application/json",
       BodyData: JSON.stringify({
@@ -24,10 +24,9 @@ document.addEventListener("DOMContentLoaded", function () {
         username
       })
     });
-
     // 회원가입을 성공하였다면
     if (response.ok) {
-      alert(data.message);
+      alert("회원가입에 성공하셨습니다!");
       location.href = '/login';
     }
   }

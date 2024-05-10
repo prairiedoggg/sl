@@ -24,7 +24,7 @@ require("dotenv").config();
 app.use(cookieParser());
 
 mongoose.connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@cluster0.qhijdtt.mongodb.net/`
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@`
 );
 
 async function tokenCheck(req, res, next) {
@@ -77,7 +77,7 @@ app.get('/mypage', tokenCheck, (req, res) => {
     res.sendFile(__dirname + '/public/EditPage/editpage.html');
 });
 
-app.get('/userpage/:username', tokenCheck, (req, res) => {
+app.get('/userpage', tokenCheck, (req, res) => {
     if (!req.user) {
         res.redirect('/login');
         return;

@@ -1,17 +1,37 @@
-import { createHeader } from '../components/header.js';
+const pageSize = 1; // 페이지당 프로필 수
+let current = 1; // 현재 페이지
+let total = 1; // 전체 페이지 수 초기값 설정
 
-// header 생성
-createHeader({ mode: true });
+const pages = document.getElementById('currentPage');
 
-const pageSize = 12; // 페이지당 프로필 수
-let currentPage = 1; // 현재 페이지
-let totalPages = 1; // 전체 페이지 수 초기값 설정
+// 이전 페이지로 이동
+function prevPage() {
+    if (current > 1) {
+        current--;
+        fetchProfiles(current);
+        pages.innerText = current;
+    } else {
+        alert("이전페이지가 존재하지 않습니다!");
+    }
+}
+
+// 다음 페이지로 이동
+function nextPage() {
+    console.log("다음페이지");
+    if (current < total) {
+        current++;
+        fetchProfiles(current);
+        pages.innerText = current;
+    } else {
+        alert("다음페이지가 존재하지 않습니다!");
+    }
+}
 
 // 프로필 카드를 생성하는 함수
 function createProfileCard(profile) {
-    const profileCard = document.createElement('div');
+    const profileCard = document.createElement('a');
     profileCard.classList.add('profile_card');
-    
+
     const profileImage = document.createElement('div');
     profileImage.classList.add('profile_image');
     profileImage.style.backgroundImage = `url('${profile.profilePictureUrl}')`; // 프로필 이미지 설정
@@ -32,9 +52,7 @@ function createProfileCard(profile) {
     comment.textContent = profile.comments;
 
     // 프로필 카드를 클릭하면 해당 사용자의 프로필을 보여주는 페이지로 이동하는 링크 추가
-    profileCard.addEventListener('click', () => {
-        window.location.href = `/showuser?username=${profile.username}`; // 프로필을 보여주는 페이지로 이동
-    });
+    profileCard.href = `/userPage/userpage.html?username=${profile.username}`;
 
     profileText.appendChild(name);
     profileText.appendChild(mail);
@@ -46,75 +64,38 @@ function createProfileCard(profile) {
     return profileCard;
 }
 
-
-// 페이지 로드 시 프로필 데이터를 가져와서 프로필 카드를 추가
-document.addEventListener('DOMContentLoaded', () => {
-    fetchProfiles(currentPage);
-});
-
-// 서버로부터 프로필 데이터를 가져오는 함수
 async function fetchProfiles(page) {
     try {
-        const response = await fetch(`/api/profiles?page=${page}`); // 서버에서 데이터를 가져오는 API 엔드포인트
+        const response = await fetch(`/api/users?page=${page}`, {
+            method: "GET"
+        }); // 서버에서 데이터를 가져오는 API 엔드포인트
         if (!response.ok) {
             throw new Error('서버로부터 데이터를 가져오는 데 실패했습니다.');
         }
-        const { currentPage, totalPages, profiles } = await response.json();
-        currentPage = currentPage;
-        totalPages = totalPages;
+        const { currentPage, totalPages, users } = await response.json();
 
-        renderProfiles(profiles);
+        current = currentPage ? currentPage : current;
+        total = totalPages ? totalPages : total;
+
+        renderProfiles(users);
     } catch (error) {
         console.error(error);
     }
 }
 
-// 이전 페이지로 이동
-function prevPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        fetchProfiles(currentPage);
-    }
-}
-
-// 다음 페이지로 이동
-function nextPage() {
-    if (currentPage < totalPages) {
-        currentPage++;
-        fetchProfiles(currentPage);
-    }
-}
+// 페이지 로드 시 프로필 데이터를 가져와서 프로필 카드를 추가
+document.addEventListener('DOMContentLoaded', () => {
+    createHeader({ text: "마이페이지", link: "/mypage" });
+    fetchProfiles(current);
+});
 
 // 프로필 카드 렌더링
-function renderProfiles(profiles) {
+function renderProfiles(user) {
     const profileZone = document.getElementById('profileZone');
     profileZone.innerHTML = '';
 
-    profiles.forEach(profile => {
-        const profileCard = createProfileCard(profile);
+    user.forEach(data => {
+        const profileCard = createProfileCard(data);
         profileZone.appendChild(profileCard);
     });
-
-    updatePagination();
 }
-
-// 페이지네이션 업데이트
-function updatePagination() {
-    const currentPageSpan = document.getElementById('currentPage');
-    const totalPagesSpan = document.getElementById('totalPages');
-
-    currentPageSpan.textContent = currentPage;
-    totalPagesSpan.textContent = totalPages;
-
-    const prevButton = document.getElementById('prevButton');
-    const nextButton = document.getElementById('nextButton');
-
-    prevButton.disabled = currentPage === 1;
-    nextButton.disabled = currentPage === totalPages;
-}
-
-// 이전 페이지 버튼에 이벤트 리스너 추가
-document.getElementById('prevButton').addEventListener('click', prevPage);
-
-// 다음 페이지 버튼에 이벤트 리스너 추가
-document.getElementById('nextButton').addEventListener('click', nextPage);

@@ -59,12 +59,16 @@ function displayUserData(userData) {
 
 // 페이지 초기화 함수
 async function initializePage() {
-    const username = location.href.split('/');
-    const { data } = await sendRequest(`/api/users/${username[username.length - 1]}`, {
-        Method: "GET"
-    });
-    setProfileImage(data.profilePictureUrl);
-    displayUserData(data);
+    const urlSearch = new URLSearchParams(location.search);
+    const username = urlSearch.get("username");
+    const query = await fetch(`/api/users/${username}`, {
+        method: "GET"
+    })
+        .then(data => data.json())
+        .catch(err => location.replace('/'));
+
+    setProfileImage(query.profilePictureUrl);
+    displayUserData(query);
 }
 
 document.addEventListener("DOMContentLoaded", initializePage);

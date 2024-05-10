@@ -2,6 +2,17 @@
 document.getElementById('login').addEventListener('click', onSubmitButton);
 document.getElementById('register').addEventListener('click', movePage);
 
+document.getElementsByName('username')[0].addEventListener('keyup', (event) => {
+    if (event.key === "Enter") {
+        onSubmitButton();
+    }
+});
+document.getElementsByName('password')[0].addEventListener('keyup', (event) => {
+    if (event.key === "Enter") {
+        onSubmitButton();
+    }
+});
+
 // 로그인
 async function onSubmitButton() {
     const email = document.getElementsByName("username")[0].value.trim();

@@ -63,18 +63,21 @@ async function sendRequest(URL, header) {
         const data = await response.json().catch(err => undefined);
 
         // 정상적인 응답이 아니며 data.message가 존재하는 경우
-        if (!response.ok && data !== undefined && data.message !== undefined) {
-            const { message } = data;
-            alert(message);
+        if (!response.ok && (data !== undefined)) {
+            if (data.message !== undefined) {
+                const { message } = data;
+                alert(message);
+            }
         }
         // 정상적이 응답이 아니고 Error Code 400 미만인경우
-        else if (!response.ok && response.status < 400) {
+        else if (!response.ok && (response.status < 400)) {
             throw new Error(ResponseError ? ResponseError : response.status);
         }
         // Error Code 400 이상인경우
-        else if (!response.ok && response.status >= 400) {
+        else if (!response.ok && (response.status >= 400)) {
             throw new Error(`${response.status} : 서버와 연결을 실패 하였습니다!`);
         }
+
         return { response, data };
     } catch (ErrorMessage) {
         console.log(ErrorMessage);

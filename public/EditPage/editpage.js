@@ -27,25 +27,52 @@ function editMode() {
 }
 
 // 이미지를 업로드하고 input 요소가 변경될 때 호출되는 함수
-function loadProfileImage(input) {
+// function loadProfileImage(input) {
+//     if (input.files && input.files[0]) {
+//         const reader = new FileReader();
+
+//         // 파일을 읽은 후 실행되는 콜백 함수
+//         reader.onload = async function (e) {
+//             const response = fetch('/api/mypage/profile-picture', {
+//                 method: "PATCH",
+//                 headers: {
+//                     "Content-Type": "multipart/form-data"
+//                 },
+//                 body: {
+//                     "profilePictureUrl": e.target.result
+//                 }
+//             })
+//         };
+
+//         // 파일을 읽음
+//         reader.readAsDataURL(input.files[0]);
+//     }
+// }
+
+// 이미지를 수정하고 URL을 서버로 전송하는 함수
+function updateProfileImage(input) {
     if (input.files && input.files[0]) {
-        const reader = new FileReader();
+        const formData = new FormData();
+        formData.append('profileImage', input.files[0]);
 
-        // 파일을 읽은 후 실행되는 콜백 함수
-        reader.onload = async function (e) {
-            const response = fetch('/api/mypage/profile-picture', {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                },
-                body: {
-                    "profilePictureUrl": e.target.result
-                }
+        // 이미지를 수정하는 요청 보내기
+        fetch('/api/mypage/profile-picture', {
+            method: 'PATCH',
+            headers: {
+                "Content-Type": ""
+            },
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 서버에서 반환한 이미지 URL을 사용하여 프로필 이미지를 업데이트
+                const profileImage = document.querySelector('.profile-image');
+                profileImage.style.backgroundImage = `url('${data.imageUrl}')`;
             })
-        };
-
-        // 파일을 읽음
-        reader.readAsDataURL(input.files[0]);
+            .catch(error => {
+                console.error('Error updating profile image:', error);
+                alert('프로필 이미지를 수정하는 중에 오류가 발생했습니다.');
+            });
     }
 }
 
