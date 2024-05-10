@@ -1,8 +1,6 @@
 const router = require("express").Router();
 const path = require("path");
-const path = require("path");
 const { createError, commonError } = require("../utils/error");
-const fs = require("fs");
 const fs = require("fs");
 const {
     User,
@@ -12,10 +10,7 @@ const {
     Portfolio,
     Reply,
 } = require("../models/models.js");
-    Reply,
-} = require("../models/models.js");
 const mongoose = require("mongoose");
-const multerConfig = require("../middlewares/multerConfig");
 const multerConfig = require("../middlewares/multerConfig");
 
 //개인 페이지
@@ -28,45 +23,7 @@ router.get("/", async (req, res, next) => {
                 401
             )
         );
-    if (!req.user) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
     }
-    const email = req.user.email;
-    try {
-        const user = await User.findOne({ email }).select("-password").lean();
-        if (!user) {
-            return next(
-                createError(
-                    "NO_RESOURCES",
-                    commonError.NO_RESOURCES.message,
-                    404
-                )
-            );
-        }
-        const [education, certificate, award, portfolioUrl, reply] =
-            await Promise.all([
-                Education.find({ user: user._id }).lean(),
-                Certificate.find({ user: user._id }).lean(),
-                Award.find({ user: user._id }).lean(),
-                Portfolio.find({ user: user._id }).lean(),
-                Reply.find({ user: user._id }).lean(),
-            ]);
-        const userData = {
-            ...user,
-            education,
-            certificate,
-            award,
-            portfolioUrl,
-            reply,
-        };
-        res.json(userData);
-    } catch (err) {
     const email = req.user.email;
     try {
         const user = await User.findOne({ email }).select("-password").lean();
@@ -112,25 +69,9 @@ router.patch("/comments", async (req, res, next) => {
                 401
             )
         );
-//자기소개 수정
-router.patch("/comments", async (req, res, next) => {
-    const email = req.user.email;
-    if (!email) {
-        return next(
-            createError(
-                "NO_ACCESS_TOKEN",
-                commonError.NO_ACCESS_TOKEN.message,
-                401
-            )
-        );
     }
 
-
     const comments = req.body.comments;
-    if (!comments) {
-        return next(
-            createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
-        );
     if (!comments) {
         return next(
             createError("NO_RESOURCES", commonError.NO_RESOURCES.message, 404)
@@ -139,8 +80,6 @@ router.patch("/comments", async (req, res, next) => {
 
     try {
         const user = await User.findOneAndUpdate(
-            { email },
-            { comments },
             { email },
             { comments },
             { new: true }
@@ -181,19 +120,6 @@ router.patch(
             );
         }
 
-        try {
-            const user = await User.findOneAndUpdate(
-                { email },
-                { profilePictureUrl: profilePictureUrl },
-                { new: true }
-            );
-            await user.save();
-            res.json(user);
-        } catch (err) {
-            next(err);
-        }
-    }
-);
         try {
             const user = await User.findOneAndUpdate(
                 { email },
