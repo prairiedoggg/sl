@@ -1,63 +1,65 @@
+createHeader({ text: "마이페이지", link: "/mypage" });
+
 // 더미 데이터
 const dummyData = [
-    { 
-        name: 'Alice', 
-        email: 'alice@example.com', 
-        comment: '안녕하세요!', 
+    {
+        name: 'Alice',
+        email: 'alice@example.com',
+        comment: '안녕하세요!',
         profilePictureUrl: 'https://example.com/profiles/alice.jpg' // 예시 URL
     },
-    { 
-        name: 'Bob', 
-        email: 'bob@example.com', 
-        comment: '잘 부탁드립니다.', 
+    {
+        name: 'Bob',
+        email: 'bob@example.com',
+        comment: '잘 부탁드립니다.',
         profilePictureUrl: 'https://example.com/profiles/bob.jpg' // 예시 URL
     },
-    { 
-        name: 'Charlie', 
-        email: 'charlie@example.com', 
-        comment: '반갑습니다.', 
+    {
+        name: 'Charlie',
+        email: 'charlie@example.com',
+        comment: '반갑습니다.',
         profilePictureUrl: 'https://example.com/profiles/charlie.jpg' // 예시 URL
     },
-    { 
-        name: 'David', 
-        email: 'david@example.com', 
-        comment: '안녕하세요!', 
+    {
+        name: 'David',
+        email: 'david@example.com',
+        comment: '안녕하세요!',
         profilePictureUrl: 'https://example.com/profiles/david.jpg' // 예시 URL
     },
-    { 
-        name: 'Emma', 
-        email: 'emma@example.com', 
-        comment: '잘 부탁드립니다.', 
+    {
+        name: 'Emma',
+        email: 'emma@example.com',
+        comment: '잘 부탁드립니다.',
         profilePictureUrl: 'https://example.com/profiles/emma.jpg' // 예시 URL
     },
-    { 
-        name: 'Frank', 
-        email: 'frank@example.com', 
-        comment: '반갑습니다.', 
+    {
+        name: 'Frank',
+        email: 'frank@example.com',
+        comment: '반갑습니다.',
         profilePictureUrl: 'https://example.com/profiles/frank.jpg' // 예시 URL
     },
-    { 
-        name: 'Grace', 
-        email: 'grace@example.com', 
-        comment: '안녕하세요!', 
+    {
+        name: 'Grace',
+        email: 'grace@example.com',
+        comment: '안녕하세요!',
         profilePictureUrl: 'https://example.com/profiles/grace.jpg' // 예시 URL
     },
-    { 
-        name: 'Henry', 
-        email: 'henry@example.com', 
-        comment: '잘 부탁드립니다.', 
+    {
+        name: 'Henry',
+        email: 'henry@example.com',
+        comment: '잘 부탁드립니다.',
         profilePictureUrl: 'https://example.com/profiles/henry.jpg' // 예시 URL
     },
-    { 
-        name: 'Isabella', 
-        email: 'isabella@example.com', 
-        comment: '반갑습니다.', 
+    {
+        name: 'Isabella',
+        email: 'isabella@example.com',
+        comment: '반갑습니다.',
         profilePictureUrl: 'https://example.com/profiles/isabella.jpg' // 예시 URL
     },
-    { 
-        name: 'Jack', 
-        email: 'jack@example.com', 
-        comment: '안녕하세요!', 
+    {
+        name: 'Jack',
+        email: 'jack@example.com',
+        comment: '안녕하세요!',
         profilePictureUrl: 'https://example.com/profiles/jack.jpg' // 예시 URL
     },
 ];
@@ -73,7 +75,7 @@ let totalPages = Math.ceil(dummyData.length / pageSize); // 전체 페이지 수
 function createProfileCard(profile) {
     const profileCard = document.createElement('div');
     profileCard.classList.add('profile_card');
-    
+
     const profileImage = document.createElement('div');
     profileImage.classList.add('profile_image');
     profileImage.style.backgroundImage = `url('${profile.profilePictureUrl}')`; // 프로필 이미지 설정

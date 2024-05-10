@@ -6,7 +6,7 @@ const { commonError, createError } = require("../utils/error");
 //페이지네이션
 router.get("/", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = 12;
+    const limit = 1;
     const skip = (page - 1) * limit;
 
     try {

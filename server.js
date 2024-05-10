@@ -35,6 +35,45 @@ app.use("/api/mypage/award", awardRoutes);
 app.use("/api/mypage/portfolio", portfolioRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/login", loginRoutes);
+
+app.get("/", tokenCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect("/login");
+        return;
+    }
+    res.sendFile(__dirname + "/public/ListPage/listpage.html");
+});
+
+app.get("/login", tokenCheck, (req, res) => {
+    if (req.user) {
+        res.redirect("/");
+    }
+    res.sendFile(__dirname + "/public/Login/login.html");
+});
+
+app.get("/register", (req, res) => {
+    if (req.user) {
+        res.redirect("/");
+    }
+    res.sendFile(__dirname + "/public/Register/register.html");
+});
+
+app.get("/mypage", tokenCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect("/login");
+        return;
+    }
+    res.sendFile(__dirname + "/public/EditPage/editpage.html");
+});
+
+app.get("/userpage", tokenCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect("/login");
+        return;
+    }
+    res.sendFile(__dirname + "/public/UserPage/userpage.html");
+});
+
 app.use((req, res, next) => {
     next(
         createError(
