@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 회원가입을 성공하였다면
     if (response.ok) {
       alert(data.message);
-      location.href = '/login';
+      location.href = '../login/login.html';
     }
   }
 

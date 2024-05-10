@@ -1,4 +1,4 @@
-createHeader({ text: "둘러보기", link: "/" });
+createHeader({ text: "둘러보기", link: "../listpage/listpage.html" });
 
 // edit 버튼 클릭 시 editMode 함수 호출
 document.addEventListener('DOMContentLoaded', function () {

@@ -1,7 +1,4 @@
-import { createHeader } from '../components/header.js';
-
-// header 생성
-createHeader({ mode: true });
+createHeader({ text: "둘러보기", link: "../listpage/listpage.html" });
 
 const pageSize = 12; // 페이지당 프로필 수
 let currentPage = 1; // 현재 페이지
