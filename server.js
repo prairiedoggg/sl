@@ -14,6 +14,7 @@ const errorHandler = require("./middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
 const { checkToken } = require("./utils/validation");
 const { createError, commonError } = require("./utils/error");
+const jwt = require("jsonwebtoken");
 
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
 app.use(express.json());
@@ -35,23 +36,53 @@ app.use("/api/mypage/portfolio", portfolioRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/login", loginRoutes);
 
-app.get("/", (req, res) => {
+async function userCheck(req, res, next) {
+    const token = req.cookies.jwt;
+    // Guard clause
+    if (token === null || token === undefined) {
+        next();
+        return;
+    }
+    try {
+        req.user = await jwt.verify(token, process.env.SECRET_KEY);
+        next();
+    } catch (err) {
+        next(err);
+    }
+}
+
+app.get("/", userCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect('/login');
+    }
     res.sendFile(__dirname + "/public/listPage/listpage.html");
 });
 
-app.get("/login", (req, res) => {
+app.get("/login", userCheck, (req, res) => {
+    if (req.user) {
+        res.redirect('/');
+    }
     res.sendFile(__dirname + "/public/login/login.html");
 });
 
-app.get("/register", (req, res) => {
+app.get("/register", userCheck, (req, res) => {
+    if (req.user) {
+        res.redirect('/');
+    }
     res.sendFile(__dirname + "/public/register/register.html");
 });
 
-app.get("/mypage", (req, res) => {
+app.get("/mypage", userCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect('/login');
+    }
     res.sendFile(__dirname + "/public/editpage/editpage.html");
 });
 
-app.get("/userpage", (req, res) => {
+app.get("/userpage", userCheck, (req, res) => {
+    if (!req.user) {
+        res.redirect('/login');
+    }
     res.sendFile(__dirname + "/public/userpage/userpage.html");
 });
 

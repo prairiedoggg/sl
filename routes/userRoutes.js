@@ -1,5 +1,12 @@
 const router = require("express").Router();
-const { User, Reply } = require("../models/models.js");
+const {
+    User,
+    Reply,
+    Education,
+    Certificate,
+    Award,
+    Portfolio
+} = require("../models/models.js");
 const { authBytoken } = require("../middlewares/authBytoken");
 const { commonError, createError } = require("../utils/error");
 
@@ -40,13 +47,27 @@ router.get("/userlist", async (req, res) => {
 // 유저 상세페이지
 router.get("/:username", async (req, res) => {
     let username = req.params.username;
-    let user = await User.findOne({ username: username }).select(
-        "-password -__v"
-    );
+    let user = await User.findOne({ username: username }).select("-password").lean();
     if (!user) {
         return res.status(404).send("User not found");
     }
-    res.json(user);
+    const [education, certificate, award, portfolioUrl, reply] =
+        await Promise.all([
+            Education.find({ user: user._id }).lean(),
+            Certificate.find({ user: user._id }).lean(),
+            Award.find({ user: user._id }).lean(),
+            Portfolio.find({ user: user._id }).lean(),
+            Reply.find({ user: user._id }).lean(),
+        ]);
+    const userData = {
+        ...user,
+        education,
+        certificate,
+        award,
+        portfolioUrl,
+        reply,
+    };
+    res.json(userData);
 });
 
 // 유저 댓글

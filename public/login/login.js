@@ -27,7 +27,7 @@ async function onSubmitButton() {
     });
     // 성공적으로 불러왔다면 '/'경로로 이동
     if (response.ok) {
-        location.href = "../listpage/listpage.html";
+        location.href = "/";
     }
 }
 

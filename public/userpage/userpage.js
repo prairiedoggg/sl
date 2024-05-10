@@ -9,6 +9,7 @@ function setProfileImage(profileImageUrl) {
 
 // 사용자 데이터를 페이지에 표시하는 함수
 function displayUserData(userData) {
+    console.log(userData);
     const { username, email, comments, award, certificate, education, portfolioUrl } = userData;
     // 이름 설정
     document.querySelector("h1").textContent = username;
@@ -72,4 +73,3 @@ async function initializePage() {
 }
 
 document.addEventListener("DOMContentLoaded", initializePage);
-
