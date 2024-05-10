@@ -1,37 +1,39 @@
 <!DOCTYPE html>
 <html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Koulen&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../login/login.css" />
+        <title>Sharelio Login</title>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Koulen&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../Login/login.css" />
-    <title>Sharelio Login</title>
-</head>
-
-<body>
-    <div>
-        <div class="titles">
-            <div class="logo">
-                <a href="/"> <!-- 로그인페이지 혹은 메인페이지로 이동 -->
-                    <img src="../img/Logo.png" alt="포트폴리오 로고">
-                </a>
+    <body>
+        <div>
+            <div class="titles">
+                <div class="logo">
+                    <a href="/">
+                        <!-- 로그인페이지 혹은 메인페이지로 이동 -->
+                        <img src="../img/Logo.png" alt="포트폴리오 로고" />
+                    </a>
+                </div>
+                <p>당신의 포트폴리오를 <span>공유</span>해보세요</p>
             </div>
-            <p>당신의 포트폴리오를 <span>공유</span>해보세요</p>
+            <div class="input-group">
+                <input type="email" placeholder="Email" name="username" />
+                <input type="password" placeholder="Password" name="password" />
+            </div>
+            <div class="submit-buttons">
+                <button type="button" id="login">로그인</button>
+                <button type="button" id="register">회원가입</button>
+            </div>
         </div>
-        <div class="input-group">
-            <input type="email" placeholder="Email" name="username">
-            <input type="password" placeholder="Password" name="password">
-        </div>
-        <div class="submit-buttons">
-            <button type="button" id="login">로그인</button>
-            <button type="button" id="register">회원가입</button>
-        </div>
-    </div>
-    <script src="../utils/transferManager.js"></script>
-    <script src="../Login/login.js"></script>
-</body>
-
+        <script src="../utils/transferManager.js"></script>
+        <script src="../login/login.js"></script>
+    </body>
 </html>
