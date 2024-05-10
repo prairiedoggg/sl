@@ -23,9 +23,7 @@ app.use(express.json());
 require("dotenv").config();
 app.use(cookieParser());
 
-mongoose.connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@`
-);
+mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@`);
 
 async function tokenCheck(req, res, next) {
     const token = req.cookies.jwt;
@@ -47,42 +45,42 @@ app.use("/api/mypage/portfolio", portfolioRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/login", loginRoutes);
 
-app.get('/', tokenCheck, (req, res) => {
+app.get("/", tokenCheck, (req, res) => {
     if (!req.user) {
-        res.redirect('/login');
+        res.redirect("/login");
         return;
     }
-    res.sendFile(__dirname + '/public/ListPage/listpage.html');
+    res.sendFile(__dirname + "/public/ListPage/listpage.html");
 });
 
-app.get('/login', tokenCheck, (req, res) => {
+app.get("/login", tokenCheck, (req, res) => {
     if (req.user) {
-        res.redirect('/');
+        res.redirect("/");
     }
-    res.sendFile(__dirname + '/public/Login/login.html');
+    res.sendFile(__dirname + "/public/Login/login.html");
 });
 
-app.get('/register', (req, res) => {
+app.get("/register", (req, res) => {
     if (req.user) {
-        res.redirect('/');
+        res.redirect("/");
     }
-    res.sendFile(__dirname + '/public/Register/register.html');
+    res.sendFile(__dirname + "/public/Register/register.html");
 });
 
-app.get('/mypage', tokenCheck, (req, res) => {
+app.get("/mypage", tokenCheck, (req, res) => {
     if (!req.user) {
-        res.redirect('/login');
+        res.redirect("/login");
         return;
     }
-    res.sendFile(__dirname + '/public/EditPage/editpage.html');
+    res.sendFile(__dirname + "/public/EditPage/editpage.html");
 });
 
-app.get('/userpage', tokenCheck, (req, res) => {
+app.get("/userpage", tokenCheck, (req, res) => {
     if (!req.user) {
-        res.redirect('/login');
+        res.redirect("/login");
         return;
     }
-    res.sendFile(__dirname + '/public/UserPage/userpage.html');
+    res.sendFile(__dirname + "/public/UserPage/userpage.html");
 });
 
 app.use((req, res, next) => {
