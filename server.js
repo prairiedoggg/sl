@@ -58,7 +58,7 @@ app.get("/register", (req, res) => {
     res.sendFile(__dirname + "/public/Register/register.html");
 });
 
-app.get("/mypage", tokenCheck, (req, res) => {
+app.get("/mypage", checkToken, (req, res) => {
     if (!req.user) {
         res.redirect("/login");
         return;
