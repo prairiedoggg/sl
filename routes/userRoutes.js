@@ -11,7 +11,11 @@ router.get("/", async (req, res) => {
 
     try {
         const totalUsers = await User.countDocuments();
-        const users = await User.find().skip(skip).limit(limit).lean();
+        const users = await User.find()
+            .skip(skip)
+            .limit(limit)
+            .select("-password -__v")
+            .lean();
         const totalPages = Math.ceil(totalUsers / limit);
 
         res.json({
