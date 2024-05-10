@@ -35,7 +35,8 @@
     - 해당 회원의 프로필 사진, 코멘트, 학력, 자격증, 수상, 포트폴리오의 정보 열람 가능
 
 - 2024년 4월 29일 월요일 
-        - erd 작성 - api 문서화 작성
+        - erd 작성 
+        - api 문서화 작성
 
 - API 문서
     - [api 문서화](https://docs.google.com/spreadsheets/d/1LIZwSXOgF8M56g2NHNhycC_yPoY6cQymbahfsNI2N6c/edit#gid=0)
