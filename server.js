@@ -36,7 +36,7 @@ app.use("/api/mypage/portfolio", portfolioRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/login", loginRoutes);
 
-app.get("/", tokenCheck, (req, res) => {
+app.get("/", checkToken, (req, res) => {
     if (!req.user) {
         res.redirect("/login");
         return;
@@ -44,7 +44,7 @@ app.get("/", tokenCheck, (req, res) => {
     res.sendFile(__dirname + "/public/listPage/listpage.html");
 });
 
-app.get("/login", tokenCheck, (req, res) => {
+app.get("/login", checkToken, (req, res) => {
     if (req.user) {
         res.redirect("/");
     }
@@ -66,7 +66,7 @@ app.get("/mypage", checkToken, (req, res) => {
     res.sendFile(__dirname + "/public/editpage/editpage.html");
 });
 
-app.get("/userpage", tokenCheck, (req, res) => {
+app.get("/userpage", checkToken, (req, res) => {
     if (!req.user) {
         res.redirect("/login");
         return;
