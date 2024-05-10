@@ -11,12 +11,21 @@ const portfolioRoutes = require("./routes/portfolioRoutes");
 const registerRoutes = require("./routes/registerRoutes");
 const loginRoutes = require("./routes/loginRoutes");
 const errorHandler = require("./middlewares/errorHandler");
+const mypageRoutes = require("./routes/mypageRoutes");
+const userRoutes = require("./routes/userRoutes");
+const eduRoutes = require("./routes/eduRoutes");
+const certRoutes = require("./routes/certRoutes");
+const awardRoutes = require("./routes/awardRoutes");
+const portfolioRoutes = require("./routes/portfolioRoutes");
+const registerRoutes = require("./routes/registerRoutes");
+const loginRoutes = require("./routes/loginRoutes");
+const errorHandler = require("./middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
 const { checkToken } = require("./utils/validation");
 const { createError, commonError } = require("./utils/error");
 
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
-app.set("view engine", "ejs");
+//app.set("view engine", "ejs");
 app.use(express.json());
 require("dotenv").config();
 app.use(cookieParser());

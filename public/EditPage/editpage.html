@@ -4,36 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Sharelio User Edit Page</title>
-    <link rel="stylesheet" href="../css/editpage.css">
+    <link rel="stylesheet" href="../components/header.css">
+    <link rel="stylesheet" href="../EditPage/editpage.css">
 </head>
 
 <body>
-    <header>
-        <!-- 로고 이미지 -->
-        <div class="logo-container">
-            <a href="#">
-                <img src="../img/Logo.png" alt="로고">
-            </a>
-        </div>
-        <nav>
-            <!-- 둘러보기와 로그아웃 링크 -->
-            <a href="#">둘러보기</a>
-            <a href="#">로그아웃</a>
-        </nav>
-    </header>
+    <header></header>
     <div class="container"> <!-- 전체 페이지 컨테이너 -->
         <main>
             <div class="portfolio-section">
-                <h2>엘리스님의 포트폴리오</h2>
+                <h2><span>엘리스</span>님의 포트폴리오</h2>
                 <!-- 추가적인 스타일을 여기에 적용 -->
             </div>
             <section class="profile">
                 <!-- 원 이미지를 넣을 수 있는 공간 -->
-                <div class="profile-image"><span>+</span></div>
+                <div class="profile-image">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="button">
+                            <label for="chooseFile">
+                                CLICK HERE!
+                            </label>
+                        </div>
+                        <input type="file" id="chooseFile" name="profilePictureUrl"
+                            accept="image/png,image/jpg,image/jpeg" onchange="loadProfileImage(this)">
+                    </form>
+                </div>
                 <!-- 이름, 이메일, 자기 소개 -->
                 <div class="profile-details">
                     <h1>앨리스</h1>
                     <p>elice@naver.com</p>
+                    <div class="introduction_div"></div>
                     <input class="introduction" type="text" placeholder="소개">
                 </div>
                 <button class="profile-edit-btn">edit</button>
@@ -43,26 +43,26 @@
                 <div class="section education">
                     <h2>학력</h2>
                     <ul>
-                        <li><span>엘리스 대학교 졸업</span> <button>edit</button></li>
+
                     </ul>
                     <div class="inputs">
 
-                        <input type="text" placeholder="학교 이름">
-                        <input type="text" placeholder="전공">
-                        <input type="text" placeholder="재학 중/졸업">
+                        <input type="text" placeholder="학교 이름" class="school" name="schoolName">
+                        <input type="text" placeholder="전공" class="major" name="fieldOfStudy">
+                        <input type="text" placeholder="재학 중/졸업" class="status" name="degree">
                         <div class="buttons">
                             <button class="add-btn">+</button>
                         </div>
                     </div>
                 </div>
                 <!-- 수상 이력 -->
-                <div class="section awards">
+                <div class="section award">
                     <h2>수상 이력</h2>
                     <ul>
-                        <li><span>엘리스 코딩대회 대상</span> <button>edit</button></li>
+
                     </ul>
                     <div class="inputs">
-                        <input type="text" placeholder="대회명">
+                        <input type="text" placeholder="대회명" name="awardName">
 
                         <button class="add-btn">+</button>
 
@@ -70,13 +70,13 @@
 
                 </div>
                 <!-- 자격증 -->
-                <div class="section certifications ">
+                <div class="section certificate ">
                     <h2>자격증</h2>
                     <ul>
-                        <li><span>정보처리기술자격증</span> <button>edit</button></li>
+
                     </ul>
                     <div class="inputs">
-                        <input type="text" placeholder="자격증 이름">
+                        <input type="text" placeholder="자격증 이름" name="name">
                         <button class="add-btn">+</button>
 
                     </div>
@@ -85,10 +85,10 @@
                 <div class="section portfolio ">
                     <h2>포트폴리오</h2>
                     <ul>
-                        <li><span>포트폴리오 공유 사이트 프론트엔드 참여</span> <button>edit</button></li>
+
                     </ul>
                     <div class="inputs">
-                        <input type="text" placeholder="프로젝트 이름">
+                        <input type="text" placeholder="프로젝트 URL" name="link">
 
                         <button class="add-btn">+</button>
 
@@ -102,7 +102,9 @@
             <!-- 추가적인 정보나 연락처를 여기에 추가 -->
         </footer>
     </div> <!-- .container 닫기 -->
-    <script src="../js/editpage.js"></script>
+    <script src="../utils/transferManager.js"></script>
+    <script src="../components/header.js"></script>
+    <script src="../EditPage/editpage.js"></script>
 </body>
 
 </html>

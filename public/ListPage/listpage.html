@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../components/header.css">
+    <link rel="stylesheet" href="../ListPage/listpage.css">
+</head>
+
+<body>
+    <header></header>
+    <div class="container">
+        <main>
+            <div class="category">
+                <div class="category_text">
+                    other's portfolio
+                </div>
+            </div>
+            <div class="profile_zone" id="profileZone">
+                <!-- Profile cards will be dynamically added here -->
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn" id="prevButton" onclick="prevPage()">&lt;</button>
+                <span id="currentPage">1</span>
+                <button class="page-btn" id="nextButton" onclick="nextPage()">&gt;</button>
+            </div>
+
+        </main>
+    </div><!--container 닫기-->
+
+    <!-- Include the JavaScript file -->
+    <script src="../utils/transferManager.js"></script>
+    <script src="../components/header.js"></script>
+    <script src="../ListPage/listpage_dummy.js"></script>
+
+</body>
+
+</html>
