@@ -5,6 +5,10 @@ const bcrypt = require("bcrypt");
 // 사용자 등록
 router.post("/", async (req, res, next) => {
     const { username, password, confirmPassword, email } = req.body;
+    // 입력 항목 검증
+    if (!username || !password || !confirmPassword || !email) {
+        return res.status(400).json({ message: "필수 입력 항목이 없습니다." });
+    }
     // 사용자 이름은 특수문자 검증
     const usernameRegex = /^[a-zA-Z가-힣0-9]+$/;
     if (!usernameRegex.test(username)) {

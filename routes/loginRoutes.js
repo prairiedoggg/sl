@@ -46,7 +46,7 @@ router.post("/", async (req, res, next) => {
 
 router.post("/token", (req, res) => {
     const refreshToken = req.cookies.refreshToken;
-    if (refreshToken == null)
+    if (refreshToken === null)
         return res.sendStatus(401).json({ message: "인증에 실패했습니다." });
     jwt.verify(
         refreshToken,
