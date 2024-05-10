@@ -5,10 +5,17 @@ const {
     Education,
     Certificate,
     Award,
-    Portfolio
+    Portfolio,
 } = require("../models/models.js");
 const { authBytoken } = require("../middlewares/authBytoken");
 const { commonError, createError } = require("../utils/error");
+
+//로그아웃
+router.post("/logout", (req, res) => {
+    res.clearCookie("jwt");
+    res.clearCookie("refreshToken");
+    res.status(200).send("로그아웃");
+});
 
 //페이지네이션
 router.get("/", async (req, res) => {
@@ -47,7 +54,9 @@ router.get("/userlist", async (req, res) => {
 // 유저 상세페이지
 router.get("/:username", async (req, res) => {
     let username = req.params.username;
-    let user = await User.findOne({ username: username }).select("-password").lean();
+    let user = await User.findOne({ username: username })
+        .select("-password")
+        .lean();
     if (!user) {
         return res.status(404).send("User not found");
     }
@@ -106,13 +115,6 @@ router.post("/:username", authBytoken, async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-});
-
-//로그아웃
-router.post("/logout", (req, res) => {
-    res.clearCookie("jwt");
-    res.clearCookie("refreshToken");
-    res.status(200).send("로그아웃");
 });
 
 module.exports = router;

@@ -2,7 +2,7 @@
 document.getElementById("login").addEventListener("click", onSubmitButton);
 document.getElementById("register").addEventListener("click", movePage);
 
-document.getElementsByName("username")[0].addEventListener("keyup", (event) => {
+document.getElementsByName("email")[0].addEventListener("keyup", (event) => {
     if (event.key === "Enter") {
         onSubmitButton();
     }
