@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sharelio Register Page</title>
+        <link rel="stylesheet" href="../Register/register.css" />
+    </head>
+
+    <body>
+        <div class="login-container">
+            <div class="logo">
+                <a href="/login">
+                    <!-- 로그인페이지 혹은 메인페이지로 이동 -->
+                    <img src="../img/Logo.png" alt="포트폴리오 로고" />
+                </a>
+            </div>
+            <div>
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        name="email"
+                    />
+                </div>
+                <div class="input-group">
+                    <label for="password">비밀번호</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-input"
+                        name="password"
+                    />
+                </div>
+                <div class="input-group">
+                    <label for="confirm_password">비밀번호 확인</label>
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        class="form-input"
+                    />
+                </div>
+                <div class="input-group">
+                    <label for="name">이름</label>
+                    <input
+                        type="text"
+                        id="name"
+                        class="form-input"
+                        name="username"
+                    />
+                </div>
+                <button class="submit-button">회원가입</button>
+            </div>
+        </div>
+        <script src="../utils/transferManager.js"></script>
+        <script src="../register/register.js"></script>
+    </body>
+</html>
