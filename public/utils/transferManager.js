@@ -11,6 +11,8 @@ function checkText(text) {
             alert("이메일이 형식에 맞지 않습니다!");
             return false;
         }
+    } else if (email === undefined) {
+        return false;
     }
     if (password !== undefined) {
         const pattern = /^(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
@@ -22,6 +24,8 @@ function checkText(text) {
             alert("패스워드는 특수 문자를 포함한 8자리 이상이어야 합니다!");
             return false;
         }
+    } else if (password === undefined) {
+        return false;
     }
     if (password !== undefined && confirmPassword !== undefined) {
         if (confirmPassword === "") {
@@ -32,6 +36,8 @@ function checkText(text) {
             alert("입력된 패스워드가 서로 같지 않습니다!");
             return false;
         }
+    } else if (confirmPassword === undefined) {
+        return false;
     }
     if (username !== undefined) {
         const pattern = /^[a-zA-Z가-힣0-9]+$/;
@@ -43,6 +49,8 @@ function checkText(text) {
             alert("사용자 이름에는 특수문자를 포함 할 수 없습니다!");
             return false;
         }
+    } else if (username === undefined) {
+        return false;
     }
     return true;
 }
