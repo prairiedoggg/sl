@@ -1,4 +1,4 @@
-const pageSize = 1; // 페이지당 프로필 수
+const pageSize = 9; // 페이지당 프로필 수
 let current = 1; // 현재 페이지
 let total = 1; // 전체 페이지 수 초기값 설정
 
