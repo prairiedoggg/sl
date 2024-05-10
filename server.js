@@ -16,7 +16,6 @@ const { checkToken } = require("./utils/validation");
 const { createError, commonError } = require("./utils/error");
 
 app.use(express.static(__dirname + "/public")); // CSS,JS,JPG(static 파일임)
-//app.set("view engine", "ejs");
 app.use(express.json());
 require("dotenv").config();
 app.use(cookieParser());
@@ -36,43 +35,43 @@ app.use("/api/mypage/portfolio", portfolioRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/login", loginRoutes);
 
-// app.get("/", checkToken, (req, res) => {
-//     if (!req.user) {
-//         res.redirect("/login");
-//         return;
-//     }
-//     res.sendFile(__dirname + "/public/listPage/listpage.html");
-// });
+app.get("/", checkToken, (req, res) => {
+    if (!req.user) {
+        res.redirect("/login");
+        return;
+    }
+    res.sendFile(__dirname + "/public/listPage/listpage.html");
+});
 
-// app.get("/login", checkToken, (req, res) => {
-//     if (req.user) {
-//         res.redirect("/");
-//     }
-//     res.sendFile(__dirname + "/public/login/login.html");
-// });
+app.get("/login", checkToken, (req, res) => {
+    if (req.user) {
+        res.redirect("/");
+    }
+    res.sendFile(__dirname + "/public/login/login.html");
+});
 
-// app.get("/register", (req, res) => {
-//     if (req.user) {
-//         res.redirect("/");
-//     }
-//     res.sendFile(__dirname + "/public/register/register.html");
-// });
+app.get("/register", (req, res) => {
+    if (req.user) {
+        res.redirect("/");
+    }
+    res.sendFile(__dirname + "/public/register/register.html");
+});
 
-// app.get("/mypage", checkToken, (req, res) => {
-//     if (!req.user) {
-//         res.redirect("/login");
-//         return;
-//     }
-//     res.sendFile(__dirname + "/public/editpage/editpage.html");
-// });
+app.get("/mypage", checkToken, (req, res) => {
+    if (!req.user) {
+        res.redirect("/login");
+        return;
+    }
+    res.sendFile(__dirname + "/public/editpage/editpage.html");
+});
 
-// app.get("/userpage", checkToken, (req, res) => {
-//     if (!req.user) {
-//         res.redirect("/login");
-//         return;
-//     }
-//     res.sendFile(__dirname + "/public/userpage/userpage.html");
-// });
+app.get("/userpage", checkToken, (req, res) => {
+    if (!req.user) {
+        res.redirect("/login");
+        return;
+    }
+    res.sendFile(__dirname + "/public/userpage/userpage.html");
+});
 
 app.use((req, res, next) => {
     next(
