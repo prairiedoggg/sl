@@ -11,9 +11,8 @@ function checkText(text) {
             alert("이메일이 형식에 맞지 않습니다!");
             return false;
         }
-    } else if (email === undefined) {
-        return false;
     }
+
     if (password !== undefined) {
         const pattern = /^(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
         if (password === "") {
@@ -24,8 +23,6 @@ function checkText(text) {
             alert("패스워드는 특수 문자를 포함한 8자리 이상이어야 합니다!");
             return false;
         }
-    } else if (password === undefined) {
-        return false;
     }
     if (password !== undefined && confirmPassword !== undefined) {
         if (confirmPassword === "") {
@@ -36,8 +33,6 @@ function checkText(text) {
             alert("입력된 패스워드가 서로 같지 않습니다!");
             return false;
         }
-    } else if (confirmPassword === undefined) {
-        return false;
     }
     if (username !== undefined) {
         const pattern = /^[a-zA-Z가-힣0-9]+$/;
@@ -49,8 +44,6 @@ function checkText(text) {
             alert("사용자 이름에는 특수문자를 포함 할 수 없습니다!");
             return false;
         }
-    } else if (username === undefined) {
-        return false;
     }
     return true;
 }
@@ -62,28 +55,32 @@ async function sendRequest(URL, header) {
         const response = await fetch(URL, {
             method: Method,
             headers: {
-                "Content-Type": (ContentType ? ContentType : "Multipart / related")
+                "Content-Type": ContentType
+                    ? ContentType
+                    : "Multipart / related",
             },
-            body: (BodyData ? BodyData : undefined)
+            body: BodyData ? BodyData : undefined,
         });
 
         // json 데이터가 존재하는지 확인하고 에러가 발생했다면 undefined
-        const data = await response.json().catch(err => undefined);
+        const data = await response.json().catch((err) => undefined);
 
         // 정상적인 응답이 아니며 data.message가 존재하는 경우
-        if (!response.ok && (data !== undefined)) {
+        if (!response.ok && data !== undefined) {
             if (data.message !== undefined) {
                 const { message } = data;
                 alert(message);
             }
         }
         // 정상적이 응답이 아니고 Error Code 400 미만인경우
-        else if (!response.ok && (response.status < 400)) {
+        else if (!response.ok && response.status < 400) {
             throw new Error(ResponseError ? ResponseError : response.status);
         }
         // Error Code 400 이상인경우
-        else if (!response.ok && (response.status >= 400)) {
-            throw new Error(`${response.status} : 서버와 연결을 실패 하였습니다!`);
+        else if (!response.ok && response.status >= 400) {
+            throw new Error(
+                `${response.status} : 서버와 연결을 실패 하였습니다!`
+            );
         }
 
         return { response, data };
@@ -91,4 +88,3 @@ async function sendRequest(URL, header) {
         console.log(ErrorMessage);
     }
 }
-
