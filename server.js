@@ -35,41 +35,23 @@ app.use("/api/mypage/portfolio", portfolioRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/login", loginRoutes);
 
-app.get("/", checkToken, (req, res) => {
-    if (!req.user) {
-        res.redirect("/login");
-        return;
-    }
+app.get("/", (req, res) => {
     res.sendFile(__dirname + "/public/listPage/listpage.html");
 });
 
-app.get("/login", checkToken, (req, res) => {
-    if (req.user) {
-        res.redirect("/");
-    }
+app.get("/login", (req, res) => {
     res.sendFile(__dirname + "/public/login/login.html");
 });
 
 app.get("/register", (req, res) => {
-    if (req.user) {
-        res.redirect("/");
-    }
     res.sendFile(__dirname + "/public/register/register.html");
 });
 
-app.get("/mypage", checkToken, (req, res) => {
-    if (!req.user) {
-        res.redirect("/login");
-        return;
-    }
+app.get("/mypage", (req, res) => {
     res.sendFile(__dirname + "/public/editpage/editpage.html");
 });
 
-app.get("/userpage", checkToken, (req, res) => {
-    if (!req.user) {
-        res.redirect("/login");
-        return;
-    }
+app.get("/userpage", (req, res) => {
     res.sendFile(__dirname + "/public/userpage/userpage.html");
 });
 
