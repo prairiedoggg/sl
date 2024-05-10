@@ -41,21 +41,21 @@ app.get("/", tokenCheck, (req, res) => {
         res.redirect("/login");
         return;
     }
-    res.sendFile(__dirname + "/public/ListPage/listpage.html");
+    res.sendFile(__dirname + "/public/listPage/listpage.html");
 });
 
 app.get("/login", tokenCheck, (req, res) => {
     if (req.user) {
         res.redirect("/");
     }
-    res.sendFile(__dirname + "/public/Login/login.html");
+    res.sendFile(__dirname + "/public/login/login.html");
 });
 
 app.get("/register", (req, res) => {
     if (req.user) {
         res.redirect("/");
     }
-    res.sendFile(__dirname + "/public/Register/register.html");
+    res.sendFile(__dirname + "/public/register/register.html");
 });
 
 app.get("/mypage", checkToken, (req, res) => {
@@ -63,7 +63,7 @@ app.get("/mypage", checkToken, (req, res) => {
         res.redirect("/login");
         return;
     }
-    res.sendFile(__dirname + "/public/EditPage/editpage.html");
+    res.sendFile(__dirname + "/public/editpage/editpage.html");
 });
 
 app.get("/userpage", tokenCheck, (req, res) => {
@@ -71,7 +71,7 @@ app.get("/userpage", tokenCheck, (req, res) => {
         res.redirect("/login");
         return;
     }
-    res.sendFile(__dirname + "/public/UserPage/userpage.html");
+    res.sendFile(__dirname + "/public/userpage/userpage.html");
 });
 
 app.use((req, res, next) => {
