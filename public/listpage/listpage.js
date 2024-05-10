@@ -52,7 +52,7 @@ function createProfileCard(profile) {
     comment.textContent = profile.comments;
 
     // 프로필 카드를 클릭하면 해당 사용자의 프로필을 보여주는 페이지로 이동하는 링크 추가
-    profileCard.href = `/userPage/userpage.html?username=${profile.username}`;
+    profileCard.href = `/userpage?username=${profile.username}`;
 
     profileText.appendChild(name);
     profileText.appendChild(mail);
