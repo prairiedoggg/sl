@@ -8,7 +8,8 @@ const errorHandler = (error, req, res, next) => {
         });
         return;
     }
-    res.status(statusCode).json({ error: message, data: null });
+    // res.status(statusCode).json({ error: message, data: null });
+    next(error);
 };
 
 module.exports = errorHandler;
