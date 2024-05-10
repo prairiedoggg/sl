@@ -48,40 +48,41 @@ async function userCheck(req, res, next) {
         next();
     } catch (err) {
         next(err);
+        return;
     }
 }
 
 app.get("/", userCheck, (req, res) => {
     if (!req.user) {
-        res.redirect('/login');
+        res.redirect("/login");
     }
     res.sendFile(__dirname + "/public/listPage/listpage.html");
 });
 
 app.get("/login", userCheck, (req, res) => {
     if (req.user) {
-        res.redirect('/');
+        res.redirect("/");
     }
     res.sendFile(__dirname + "/public/login/login.html");
 });
 
 app.get("/register", userCheck, (req, res) => {
     if (req.user) {
-        res.redirect('/');
+        res.redirect("/");
     }
     res.sendFile(__dirname + "/public/register/register.html");
 });
 
 app.get("/mypage", userCheck, (req, res) => {
     if (!req.user) {
-        res.redirect('/login');
+        res.redirect("/login");
     }
     res.sendFile(__dirname + "/public/editpage/editpage.html");
 });
 
 app.get("/userpage", userCheck, (req, res) => {
     if (!req.user) {
-        res.redirect('/login');
+        res.redirect("/login");
     }
     res.sendFile(__dirname + "/public/userpage/userpage.html");
 });
