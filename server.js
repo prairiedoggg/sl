@@ -56,7 +56,7 @@ app.get("/", userCheck, (req, res) => {
     if (!req.user) {
         res.redirect("/login");
     }
-    res.sendFile(__dirname + "/public/listPage/listpage.html");
+    res.sendFile(__dirname + "/public/listpage/listpage.html");
 });
 
 app.get("/login", userCheck, (req, res) => {
